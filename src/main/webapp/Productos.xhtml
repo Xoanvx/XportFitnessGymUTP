@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
     xmlns:ui="jakarta.faces.facelets" xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core"
+    xmlns:pt="jakarta.faces.passthrough"
     xmlns:app="jakarta.faces.composite/components" template="/WEB-INF/templates/principal.xhtml">
     <ui:param name="menuOpcion" value="listarProductos" />
     <ui:param name="menuSubmenu" value="catalogo" />
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewAction action="#{productoBean.prepararListado}" />
+        </f:metadata>
+    </ui:define>
     <ui:define name="title">Productos | Xport Fitness Gym</ui:define>
     <ui:define name="styles">
 <link rel="stylesheet"
@@ -13,7 +19,7 @@
     
     
     
-    <style><![CDATA[
+    <style>
         .foto-producto-avatar {
             border-radius: 12px !important;
             background-color: #f1f5f9 !important;
@@ -28,7 +34,216 @@
         .nota-productos {
             margin-bottom: 20px;
         }
-    ]]></style>
+
+        /* ---------- Filtros de búsqueda ---------- */
+        .criterios-busqueda {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 12.5px;
+            color: #17233C;
+        }
+
+        .criterios-titulo {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+            color: #10234D;
+        }
+
+        .criterios-opciones,
+        .criterios-opciones tbody,
+        .criterios-opciones tr {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            border: 0;
+            margin: 0;
+        }
+
+        .criterios-opciones td {
+            display: inline-flex;
+            align-items: center;
+            padding: 0;
+            border: 0;
+        }
+
+        .criterios-opciones input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            margin: 0;
+        }
+
+        .criterios-opciones label {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            border: 1px solid #D8DFEA;
+            border-radius: 999px;
+            background: #FFFFFF;
+            color: #475569;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+
+        .criterios-opciones label:hover {
+            border-color: #2864F0;
+            color: #2864F0;
+        }
+
+        .criterios-opciones input[type="radio"]:checked + label {
+            background: #2864F0;
+            border-color: #2864F0;
+            color: #FFFFFF;
+        }
+
+        .criterios-opciones input[type="radio"]:focus-visible + label {
+            outline: 2px solid #2864F0;
+            outline-offset: 2px;
+        }
+
+        /* Campo según la condición + botones compactos */
+        .productos-main .productos-toolbar.toolbar-busqueda {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .productos-main .toolbar-busqueda .busqueda-productos,
+        .productos-main .toolbar-busqueda .filtro-productos {
+            flex: 0 1 380px;
+        }
+
+        .btn-toolbar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            height: 38px;
+            padding: 0 14px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-toolbar.btn-buscar { background: #2864F0; border: 1px solid #2864F0; color: #FFFFFF; }
+        .btn-toolbar.btn-buscar:hover { background: #174CC5; }
+        .btn-toolbar.btn-listar { background: #FFFFFF; border: 1px solid #2864F0; color: #2864F0; }
+        .btn-toolbar.btn-listar:hover { background: #EAF0FF; }
+
+        /* Mensajes */
+        .mensajes-productos {
+            list-style: none;
+            margin: 0 0 14px;
+            padding: 0;
+            font-size: 13px;
+        }
+
+        .mensajes-productos li {
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+
+        .mensajes-productos .msj-info { background: #ECFDF3; color: #067647; border: 1px solid #A6E3BD; }
+        .mensajes-productos .msj-error { background: #FFF1F1; color: #B42318; border: 1px solid #F3B4B4; }
+
+        /* Paginación: mismo estilo que ListaClientes (css/listaclientes.css) */
+        .clientes-paginacion {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 14px;
+            padding: 12px 14px;
+            border: 1px solid #dfe6f2;
+            border-radius: 10px;
+            background: #f7f9fd;
+            font-size: 13px;
+            color: #4a5670;
+        }
+
+        .clientes-paginacion .pag-info strong {
+            color: #0d214f;
+        }
+
+        .clientes-paginacion .pag-botones {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .clientes-paginacion .pag-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 34px;
+            height: 34px;
+            padding: 0 10px;
+            border: 1px solid #cfd9ea;
+            border-radius: 8px;
+            background: #fff;
+            color: #2864f0;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background .15s, color .15s;
+        }
+
+        .clientes-paginacion .pag-btn:hover {
+            background: #e8efff;
+        }
+
+        .clientes-paginacion .pag-btn.pag-actual {
+            background: #2864f0;
+            border-color: #2864f0;
+            color: #fff;
+        }
+
+        .clientes-paginacion .pag-btn.pag-deshabilitado {
+            pointer-events: none;
+            opacity: .4;
+        }
+
+        .clientes-paginacion .pag-tamano {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .clientes-paginacion .pag-tamano select {
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid #cfd9ea;
+            border-radius: 8px;
+            background: #fff;
+            color: #0d214f;
+        }
+
+        @media (max-width: 760px) {
+            .clientes-paginacion {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .clientes-paginacion .pag-botones,
+            .clientes-paginacion .pag-tamano {
+                justify-content: center;
+            }
+        }
+
+        .productos-main .accion-btn { text-decoration: none; }
+    </style>
     </ui:define>
     <ui:define name="content">
 <!-- CONTENIDO PRINCIPAL -->
@@ -187,265 +402,230 @@
 
         </section>
 
-        <!-- LISTADO DE PRODUCTOS -->
+        <!-- LISTADO DE PRODUCTOS (datos reales: productoBean) -->
         <section class="contenido-card movimientos-card productos-listado">
 
             <div class="card-heading movimientos-heading">
                 <div>
                     <h2>Lista de productos</h2>
-                    <p>Busca, filtra y administra los productos registrados</p>
+                    <p>#{productoBean.descripcionFiltro}</p>
                 </div>
-                <span class="movimientos-count" id="result-count">8 productos</span>
+                <span class="movimientos-count" id="result-count">#{productoBean.totalItems} #{productoBean.totalItems eq 1 ? 'producto' : 'productos'}</span>
             </div>
 
-            <div class="productos-toolbar">
-                <label class="busqueda-productos">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input id="product-search" type="search"
-                           placeholder="Buscar por nombre o código..."
-                           aria-label="Buscar productos" />
-                </label>
+            <h:messages globalOnly="true" layout="list" styleClass="mensajes-productos"
+                        infoClass="msj-info" errorClass="msj-error" />
 
-                <label class="filtro-productos">
-                    <i class="fa-solid fa-filter"></i>
-                    <select id="category-filter" aria-label="Filtrar por categoría">
-                        <option value="">Todas las categorías</option>
-                        <option>Suplementos</option>
-                        <option>Accesorios</option>
-                        <option>Ropa deportiva</option>
-                        <option>Bebidas</option>
-                    </select>
-                </label>
+            <h:form id="frmListaProductos" prependId="false">
 
-                <label class="filtro-productos">
-                    <i class="fa-solid fa-boxes-stacked"></i>
-                    <select id="stock-filter" aria-label="Filtrar por stock">
-                        <option value="">Todos los estados</option>
-                        <option value="disponible">Disponible</option>
-                        <option value="bajo">Stock bajo</option>
-                        <option value="agotado">Agotado</option>
-                    </select>
-                </label>
-            </div>
+                <!-- Condición de filtro -->
+                <div class="criterios-busqueda" role="radiogroup" aria-label="Condición de búsqueda">
+                    <span class="criterios-titulo"><i class="fa-solid fa-filter"></i> Buscar por:</span>
+                    <h:selectOneRadio id="criterioBusqueda" value="#{productoBean.criterioBusqueda}"
+                                      layout="lineDirection" styleClass="criterios-opciones">
+                        <f:selectItem itemLabel="Nombre" itemValue="NOMBRE" />
+                        <f:selectItem itemLabel="Código de Barra" itemValue="BARRA" />
+                        <f:selectItem itemLabel="Categoría" itemValue="CATEGORIA" />
+                        <f:selectItem itemLabel="Marca" itemValue="MARCA" />
+                    </h:selectOneRadio>
+                </div>
 
-            <div class="tabla-scroll">
-                <table class="tabla-movimientos tabla-productos">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Categoría</th>
-                            <th>Precio</th>
-                            <th>Stock</th>
-                            <th>Estado</th>
-                            <th class="acciones-col">Acciones</th>
-                        </tr>
-                    </thead>
+                <div class="productos-toolbar toolbar-busqueda">
+                    <!-- Nombre o código de barra -->
+                    <label class="busqueda-productos" id="busquedaTexto"
+                           style="#{productoBean.criterioBusqueda eq 'CATEGORIA' or productoBean.criterioBusqueda eq 'MARCA' ? 'display:none' : ''}">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <h:inputText id="textoBusqueda" value="#{productoBean.textoBusqueda}"
+                                     pt:aria-label="Texto a buscar"
+                                     pt:placeholder="#{productoBean.criterioBusqueda eq 'BARRA' ? 'Escanee o escriba el código de barra...' : 'Buscar por nombre o descripción...'}" />
+                    </label>
 
-                    <tbody id="product-rows">
+                    <!-- Categoría -->
+                    <label class="filtro-productos" id="busquedaCategoria"
+                           style="#{productoBean.criterioBusqueda eq 'CATEGORIA' ? '' : 'display:none'}">
+                        <i class="fa-solid fa-tags"></i>
+                        <h:selectOneMenu id="categoriaBusqueda" value="#{productoBean.categoriaBusqueda}"
+                                         pt:aria-label="Categoría">
+                            <f:selectItem itemLabel="Seleccione la categoría" itemValue="0" />
+                            <f:selectItems value="#{productoBean.listaCategorias}" var="c"
+                                           itemValue="#{c.categoria_ID}" itemLabel="#{c.nombre}" />
+                        </h:selectOneMenu>
+                    </label>
 
-                        <tr data-name="proteina whey 2lb chocolate"
-                            data-code="prod-001" data-category="Suplementos"
-                            data-stock="15">
-                            <td>
-                                <span class="mov-icon prod-icon prod-suplemento">
-                                    <i class="fa-solid fa-bottle-water"></i>
-                                </span>
-                                <span class="mov-info">
-                                    <strong>Proteína Whey 2lb Chocolate</strong>
-                                    <small>PROD-001 · Código de producto</small>
-                                </span>
-                            </td>
-                            <td>Suplementos</td>
-                            <td class="precio-producto">S/ 120.00</td>
-                            <td>15 unidades</td>
-                            <td><span class="estado estado-completado">Disponible</span></td>
-                            <td class="acciones">
-                                <button type="button" class="accion-btn editar-btn"
-                                        title="Editar producto">
-                                    <i class="fa-solid fa-pen"></i>
-                                </button>
-                                <button type="button" class="accion-btn reponer-btn"
-                                        title="Registrar reposición">
-                                    <i class="fa-solid fa-boxes-stacked"></i>
-                                </button>
-                                <button type="button" class="accion-btn eliminar-btn"
-                                        title="Quitar de la lista">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
+                    <!-- Marca -->
+                    <label class="filtro-productos" id="busquedaMarca"
+                           style="#{productoBean.criterioBusqueda eq 'MARCA' ? '' : 'display:none'}">
+                        <i class="fa-solid fa-copyright"></i>
+                        <h:selectOneMenu id="marcaBusqueda" value="#{productoBean.marcaBusqueda}"
+                                         pt:aria-label="Marca">
+                            <f:selectItem itemLabel="Seleccione la marca" itemValue="0" />
+                            <f:selectItems value="#{productoBean.listaMarcas}" var="m"
+                                           itemValue="#{m.marca_ID}" itemLabel="#{m.nombre}" />
+                        </h:selectOneMenu>
+                    </label>
 
-                        <tr data-name="shaker xport azul" data-code="prod-002"
-                            data-category="Accesorios" data-stock="40">
-                            <td>
-                                <span class="mov-icon prod-icon prod-accesorio">
-                                    <i class="fa-solid fa-glass-water"></i>
-                                </span>
-                                <span class="mov-info">
-                                    <strong>Shaker Xport Azul</strong>
-                                    <small>PROD-002 · Código de producto</small>
-                                </span>
-                            </td>
-                            <td>Accesorios</td>
-                            <td class="precio-producto">S/ 25.00</td>
-                            <td>40 unidades</td>
-                            <td><span class="estado estado-completado">Disponible</span></td>
-                            <td class="acciones">
-                                <button type="button" class="accion-btn editar-btn" title="Editar producto"><i class="fa-solid fa-pen"></i></button>
-                                <button type="button" class="accion-btn reponer-btn" title="Registrar reposición"><i class="fa-solid fa-boxes-stacked"></i></button>
-                                <button type="button" class="accion-btn eliminar-btn" title="Quitar de la lista"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
+                    <h:commandLink id="btnBuscarProducto" action="#{productoBean.buscar}" styleClass="btn-toolbar btn-buscar">
+                        <i class="fa-solid fa-magnifying-glass"></i>&#160;Buscar (F5)
+                    </h:commandLink>
+                    <h:commandLink id="btnListarProductos" action="#{productoBean.listar}" styleClass="btn-toolbar btn-listar">
+                        <i class="fa-solid fa-list"></i>&#160;Listar (F7)
+                    </h:commandLink>
+                </div>
 
-                        <tr data-name="polera oversize negra" data-code="prod-003"
-                            data-category="Ropa deportiva" data-stock="0">
-                            <td>
-                                <span class="mov-icon prod-icon prod-ropa">
-                                    <i class="fa-solid fa-shirt"></i>
-                                </span>
-                                <span class="mov-info">
-                                    <strong>Polera Oversize Negra</strong>
-                                    <small>PROD-003 · Código de producto</small>
-                                </span>
-                            </td>
-                            <td>Ropa deportiva</td>
-                            <td class="precio-producto">S/ 65.00</td>
-                            <td>0 unidades</td>
-                            <td><span class="estado estado-agotado">Agotado</span></td>
-                            <td class="acciones">
-                                <button type="button" class="accion-btn editar-btn" title="Editar producto"><i class="fa-solid fa-pen"></i></button>
-                                <button type="button" class="accion-btn reponer-btn" title="Registrar reposición"><i class="fa-solid fa-boxes-stacked"></i></button>
-                                <button type="button" class="accion-btn eliminar-btn" title="Quitar de la lista"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
+                <div class="tabla-scroll">
+                    <table class="tabla-movimientos tabla-productos">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Marca</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Estado</th>
+                                <th class="acciones-col">Acciones</th>
+                            </tr>
+                        </thead>
 
-                        <tr data-name="creatina monohidratada" data-code="prod-004"
-                            data-category="Suplementos" data-stock="8">
-                            <td>
-                                <span class="mov-icon prod-icon prod-suplemento">
-                                    <i class="fa-solid fa-jar"></i>
-                                </span>
-                                <span class="mov-info">
-                                    <strong>Creatina Monohidratada</strong>
-                                    <small>PROD-004 · Código de producto</small>
-                                </span>
-                            </td>
-                            <td>Suplementos</td>
-                            <td class="precio-producto">S/ 89.90</td>
-                            <td>8 unidades</td>
-                            <td><span class="estado estado-completado">Disponible</span></td>
-                            <td class="acciones">
-                                <button type="button" class="accion-btn editar-btn" title="Editar producto"><i class="fa-solid fa-pen"></i></button>
-                                <button type="button" class="accion-btn reponer-btn" title="Registrar reposición"><i class="fa-solid fa-boxes-stacked"></i></button>
-                                <button type="button" class="accion-btn eliminar-btn" title="Quitar de la lista"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
+                        <tbody id="product-rows">
+                            <ui:repeat value="#{productoBean.listaPagina}" var="p">
+                                <tr>
+                                    <td>
+                                        <span class="mov-icon prod-icon prod-suplemento">
+                                            <i class="fa-solid #{p.tipoProd eq 'S' ? 'fa-dumbbell' : 'fa-box'}"></i>
+                                        </span>
+                                        <span class="mov-info">
+                                            <strong>#{p.nombreProducto}</strong>
+                                            <small>#{p.producto_ID}#{empty p.codigoBarra ? '' : ' · CB: '.concat(p.codigoBarra)} · #{p.unidadMedida}</small>
+                                        </span>
+                                    </td>
+                                    <td>#{p.categoria}</td>
+                                    <td>#{p.marca}</td>
+                                    <td class="precio-producto">
+                                        S/ <h:outputText value="#{p.precioVenta}"><f:convertNumber minFractionDigits="2" maxFractionDigits="2" /></h:outputText>
+                                    </td>
+                                    <td>
+                                        <h:outputText value="#{p.stockFinal}"><f:convertNumber maxFractionDigits="2" /></h:outputText>
+                                        #{p.stockFinal eq 1 ? 'unidad' : 'unidades'}
+                                    </td>
+                                    <td>
+                                        <span class="estado #{p.stockFinal le 0 ? 'estado-agotado' : (p.stockFinal le 5 ? 'estado-bajo' : 'estado-completado')}">
+                                            #{p.stockFinal le 0 ? 'Agotado' : (p.stockFinal le 5 ? 'Stock bajo' : 'Disponible')}
+                                        </span>
+                                    </td>
+                                    <td class="acciones">
+                                        <h:commandLink action="#{productoBean.editar(p)}" styleClass="accion-btn editar-btn"
+                                                       title="Editar producto">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </h:commandLink>
+                                        <h:commandLink action="#{productoBean.eliminar(p)}" styleClass="accion-btn eliminar-btn"
+                                                       title="Eliminar (queda Inactivo)"
+                                                       onclick="return confirm('¿Desea eliminar el artículo #{p.producto_ID}? Quedará Inactivo.');">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </h:commandLink>
+                                    </td>
+                                </tr>
+                            </ui:repeat>
+                        </tbody>
+                    </table>
 
-                        <tr data-name="guantes entrenamiento" data-code="prod-005"
-                            data-category="Accesorios" data-stock="3">
-                            <td>
-                                <span class="mov-icon prod-icon prod-accesorio">
-                                    <i class="fa-solid fa-mitten"></i>
-                                </span>
-                                <span class="mov-info">
-                                    <strong>Guantes de Entrenamiento</strong>
-                                    <small>PROD-005 · Código de producto</small>
-                                </span>
-                            </td>
-                            <td>Accesorios</td>
-                            <td class="precio-producto">S/ 39.90</td>
-                            <td>3 unidades</td>
-                            <td><span class="estado estado-bajo">Stock bajo</span></td>
-                            <td class="acciones">
-                                <button type="button" class="accion-btn editar-btn" title="Editar producto"><i class="fa-solid fa-pen"></i></button>
-                                <button type="button" class="accion-btn reponer-btn" title="Registrar reposición"><i class="fa-solid fa-boxes-stacked"></i></button>
-                                <button type="button" class="accion-btn eliminar-btn" title="Quitar de la lista"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
+                    <h:panelGroup layout="block" styleClass="sin-resultados" rendered="#{empty productoBean.lista}">
+                        No se encontraron productos con esa condición.
+                    </h:panelGroup>
+                </div>
 
-                        <tr data-name="polera oversize gris" data-code="prod-006"
-                            data-category="Ropa deportiva" data-stock="12">
-                            <td>
-                                <span class="mov-icon prod-icon prod-ropa">
-                                    <i class="fa-solid fa-shirt"></i>
-                                </span>
-                                <span class="mov-info">
-                                    <strong>Polera Oversize Gris</strong>
-                                    <small>PROD-006 · Código de producto</small>
-                                </span>
-                            </td>
-                            <td>Ropa deportiva</td>
-                            <td class="precio-producto">S/ 65.00</td>
-                            <td>12 unidades</td>
-                            <td><span class="estado estado-completado">Disponible</span></td>
-                            <td class="acciones">
-                                <button type="button" class="accion-btn editar-btn" title="Editar producto"><i class="fa-solid fa-pen"></i></button>
-                                <button type="button" class="accion-btn reponer-btn" title="Registrar reposición"><i class="fa-solid fa-boxes-stacked"></i></button>
-                                <button type="button" class="accion-btn eliminar-btn" title="Quitar de la lista"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
+                <!-- Paginación igual que ListaClientes; cambiar de página o de tamaño no vuelve a consultar la BD -->
+                <h:panelGroup layout="block" styleClass="clientes-paginacion" rendered="#{productoBean.conPaginacion}">
+                    <span class="pag-info">Mostrando <strong>#{productoBean.desde}</strong> a <strong>#{productoBean.hasta}</strong> de <strong>#{productoBean.totalItems}</strong> productos</span>
 
-                        <tr data-name="agua mineral xport" data-code="prod-007"
-                            data-category="Bebidas" data-stock="0">
-                            <td>
-                                <span class="mov-icon prod-icon prod-bebida">
-                                    <i class="fa-solid fa-bottle-water"></i>
-                                </span>
-                                <span class="mov-info">
-                                    <strong>Agua Mineral Xport</strong>
-                                    <small>PROD-007 · Código de producto</small>
-                                </span>
-                            </td>
-                            <td>Bebidas</td>
-                            <td class="precio-producto">S/ 3.00</td>
-                            <td>0 unidades</td>
-                            <td><span class="estado estado-agotado">Agotado</span></td>
-                            <td class="acciones">
-                                <button type="button" class="accion-btn editar-btn" title="Editar producto"><i class="fa-solid fa-pen"></i></button>
-                                <button type="button" class="accion-btn reponer-btn" title="Registrar reposición"><i class="fa-solid fa-boxes-stacked"></i></button>
-                                <button type="button" class="accion-btn eliminar-btn" title="Quitar de la lista"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
+                    <nav class="pag-botones" aria-label="Paginación de productos">
+                        <h:commandLink action="#{productoBean.irAPagina(1)}" title="Primera página"
+                                       styleClass="pag-btn #{productoBean.pagina eq 1 ? 'pag-deshabilitado' : ''}">
+                            <i class="fa-solid fa-angles-left"></i>
+                        </h:commandLink>
+                        <h:commandLink action="#{productoBean.irAPagina(productoBean.pagina - 1)}" title="Anterior"
+                                       styleClass="pag-btn #{productoBean.pagina eq 1 ? 'pag-deshabilitado' : ''}">
+                            <i class="fa-solid fa-angle-left"></i>
+                        </h:commandLink>
+                        <ui:repeat value="#{productoBean.paginasVisibles}" var="num">
+                            <h:commandLink action="#{productoBean.irAPagina(num)}" value="#{num}"
+                                           styleClass="pag-btn #{num eq productoBean.pagina ? 'pag-actual' : ''}" />
+                        </ui:repeat>
+                        <h:commandLink action="#{productoBean.irAPagina(productoBean.pagina + 1)}" title="Siguiente"
+                                       styleClass="pag-btn #{productoBean.pagina eq productoBean.totalPaginas ? 'pag-deshabilitado' : ''}">
+                            <i class="fa-solid fa-angle-right"></i>
+                        </h:commandLink>
+                        <h:commandLink action="#{productoBean.irAPagina(productoBean.totalPaginas)}" title="Última página"
+                                       styleClass="pag-btn #{productoBean.pagina eq productoBean.totalPaginas ? 'pag-deshabilitado' : ''}">
+                            <i class="fa-solid fa-angles-right"></i>
+                        </h:commandLink>
+                    </nav>
 
-                        <tr data-name="proteina whey 5lb vainilla" data-code="prod-008"
-                            data-category="Suplementos" data-stock="90">
-                            <td>
-                                <span class="mov-icon prod-icon prod-suplemento">
-                                    <i class="fa-solid fa-bottle-water"></i>
-                                </span>
-                                <span class="mov-info">
-                                    <strong>Proteína Whey 5lb Vainilla</strong>
-                                    <small>PROD-008 · Código de producto</small>
-                                </span>
-                            </td>
-                            <td>Suplementos</td>
-                            <td class="precio-producto">S/ 245.00</td>
-                            <td>90 unidades</td>
-                            <td><span class="estado estado-completado">Disponible</span></td>
-                            <td class="acciones">
-                                <button type="button" class="accion-btn editar-btn" title="Editar producto"><i class="fa-solid fa-pen"></i></button>
-                                <button type="button" class="accion-btn reponer-btn" title="Registrar reposición"><i class="fa-solid fa-boxes-stacked"></i></button>
-                                <button type="button" class="accion-btn eliminar-btn" title="Quitar de la lista"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-
-                    </tbody>
-                </table>
-
-                <p class="sin-resultados" id="empty-state" hidden="hidden">
-                    No se encontraron productos con esos filtros.
-                </p>
-            </div>
-
-            <p class="nota-demo">
-                <i class="fa-solid fa-circle-info"></i>
-                Datos de muestra para el dashboard.
-            </p>
+                    <div class="pag-tamano">
+                        <label for="tamPagina">Mostrar</label>
+                        <h:selectOneMenu id="tamPagina" value="#{productoBean.tamPagina}" onchange="this.form.submit()">
+                            <f:selectItems value="#{productoBean.tamanosPagina}" var="t" itemValue="#{t}" itemLabel="#{t}" />
+                        </h:selectOneMenu>
+                        <span>por página</span>
+                    </div>
+                </h:panelGroup>
+            </h:form>
         </section>
 
     </main>
     </ui:define>
     <ui:define name="scripts">
-<script src="#{request.contextPath}/js/productos-dashboard.js"></script>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function () {
+    "use strict";
+
+    const cajaTexto = document.getElementById("busquedaTexto");
+    const cajaCategoria = document.getElementById("busquedaCategoria");
+    const cajaMarca = document.getElementById("busquedaMarca");
+    const texto = document.getElementById("textoBusqueda");
+    const criterios = document.querySelectorAll('input[name="criterioBusqueda"]');
+
+    // Muestra el campo que corresponde a la condición marcada
+    function aplicarCriterio(valor) {
+        const esTexto = valor === "NOMBRE" || valor === "BARRA";
+        cajaTexto.style.display = esTexto ? "" : "none";
+        cajaCategoria.style.display = valor === "CATEGORIA" ? "" : "none";
+        cajaMarca.style.display = valor === "MARCA" ? "" : "none";
+
+        if (esTexto) {
+            texto.placeholder = valor === "BARRA"
+                ? "Escanee o escriba el código de barra..."
+                : "Buscar por nombre o descripción...";
+            texto.focus();
+        }
+    }
+
+    criterios.forEach(function (radio) {
+        radio.addEventListener("change", function () {
+            if (radio.checked) aplicarCriterio(radio.value);
+        });
+    });
+
+    // Enter en el texto ejecuta Buscar
+    if (texto) {
+        texto.addEventListener("keydown", function (evento) {
+            if (evento.key === "Enter") {
+                evento.preventDefault();
+                document.getElementById("btnBuscarProducto").click();
+            }
+        });
+    }
+
+    // F5 Buscar, F7 Listar (como frm_Productos)
+    document.addEventListener("keydown", function (evento) {
+        let id = null;
+        if (evento.key === "F5") id = "btnBuscarProducto";
+        if (evento.key === "F7") id = "btnListarProductos";
+        if (id) {
+            evento.preventDefault();
+            document.getElementById(id).click();
+        }
+    });
+});
+</script>
     </ui:define>
 </ui:composition>

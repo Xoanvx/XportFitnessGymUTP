@@ -71,7 +71,10 @@
                         </div>
                         <h:message for="contrasena" styleClass="login-messages" />
                     </div>
-                    <div class="form-options"><span class="help-text">¿Problemas para ingresar? Consulta en recepción.</span></div>
+                    <div class="form-options">
+                        <span class="help-text">¿Problemas para ingresar? Consulta en recepción.</span>
+                        <a href="#" class="olvide-clave" id="abrirRecuperar">¿Has olvidado tu clave?</a>
+                    </div>
                     <h:commandButton value="INGRESAR" action="#{loginBean.autenticar}" styleClass="submit-button" />
                 </h:form>
                 <div class="secure-note"><i class="fa-solid fa-shield-halved"></i> Acceso seguro para miembros</div>
@@ -79,6 +82,37 @@
             <footer class="form-footer"><span>© 2026 Xport Fitness Gym</span><span>ENTRENA. CRECE. REPITE.</span></footer>
         </section>
     </main>
+
+    <!-- Ventana "¿Has olvidado tu clave?": formulario aparte para no validar usuario/contraseña -->
+    <div id="recuperarModal" class="recuperar-modal#{recuperarClaveBean.mostrar ? ' abierto' : ''}"
+         role="dialog" aria-modal="true" aria-labelledby="recuperarTitulo">
+        <div class="recuperar-caja">
+            <button type="button" class="recuperar-cerrar" aria-label="Cerrar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <span class="recuperar-icono"><i class="fa-solid fa-key"></i></span>
+            <h3 id="recuperarTitulo">¿Has olvidado tu clave?</h3>
+            <p>Ingresa el correo registrado en tu ficha de personal. Te enviaremos una clave temporal para ingresar.</p>
+
+            <h:form id="recuperarForm">
+                <h:panelGroup rendered="#{not empty recuperarClaveBean.error}" layout="block" styleClass="login-error" pt:role="alert">
+                    <span aria-hidden="true">!</span><h:outputText value="#{recuperarClaveBean.error}" />
+                </h:panelGroup>
+                <h:panelGroup rendered="#{not empty recuperarClaveBean.mensaje}" layout="block" styleClass="recuperar-ok" pt:role="status">
+                    <i class="fa-solid fa-circle-check"></i><h:outputText value="#{recuperarClaveBean.mensaje}" />
+                </h:panelGroup>
+                <div class="field">
+                    <h:outputLabel for="correo" value="Correo electrónico" />
+                    <div class="input-wrap">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                        <h:inputText id="correo" value="#{recuperarClaveBean.correo}"
+                                     autocomplete="email" pt:type="email" pt:placeholder="tucorreo@ejemplo.com" />
+                    </div>
+                </div>
+                <h:commandButton value="ENVIAR CLAVE" action="#{recuperarClaveBean.recuperar}" styleClass="submit-button" />
+            </h:form>
+        </div>
+    </div>
     <script type="text/javascript">
         (function () {
             var toggle = document.querySelector('.toggle-password');
@@ -102,6 +136,35 @@
                         );
                     });
                 }
+            }
+
+            // Ventana "¿Has olvidado tu clave?"
+            var modal = document.getElementById('recuperarModal');
+            var abrir = document.getElementById('abrirRecuperar');
+            var correo = document.getElementById('recuperarForm:correo');
+
+            function abrirModal(e) {
+                if (e) e.preventDefault();
+                modal.classList.add('abierto');
+                if (correo !== null) correo.focus();
+            }
+
+            function cerrarModal() {
+                modal.classList.remove('abierto');
+                if (abrir !== null) abrir.focus();
+            }
+
+            if (modal !== null) {
+                if (abrir !== null) abrir.addEventListener('click', abrirModal);
+                modal.querySelector('.recuperar-cerrar').addEventListener('click', cerrarModal);
+                modal.addEventListener('click', function (e) {
+                    if (e.target === modal) cerrarModal();
+                });
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') {
+                        if (modal.classList.contains('abierto')) cerrarModal();
+                    }
+                });
             }
         }());
     </script>

@@ -56,8 +56,33 @@ public class LoginBean implements Serializable {
         Map<String, Object> session = external.getSessionMap();
         session.put("usuarioAutenticado", dto);
         session.put("usuario", usuario.trim());
-        session.put("rol", dto.getRol());
+        String rol = dto.getRol() == null ? "" : dto.getRol().trim();
+        session.put("rol", rol);
+        session.put("area", dto.getArea() == null ? "" : dto.getArea().trim());
+        session.put("esAdmin", tieneAccesoTotal(dto));
         return "/dashboard.xhtml?faces-redirect=true";
+    }
+
+    /**
+     * Acceso a todos los formularios (menús Personal y Catálogo, cambiar clave de otros, etc.):
+     * rol Administrador o personal del área de Sistemas.
+     */
+    public static boolean tieneAccesoTotal(UsuarioDTO dto) {
+        if (dto == null) return false;
+        return esRolAdministrador(dto.getRol()) || esAreaSistemas(dto.getArea());
+    }
+
+    /** Área "Sistemas" sin importar mayúsculas ni espacios (Sistemas, SISTEMAS, Área de Sistemas...). */
+    public static boolean esAreaSistemas(String area) {
+        if (area == null) return false;
+        return area.trim().toUpperCase(java.util.Locale.ROOT).contains("SISTEMA");
+    }
+
+    /** Administrador sin importar mayúsculas ni espacios (ADMIN, Administrador, ADMINISTRADOR...). */
+    public static boolean esRolAdministrador(String rol) {
+        if (rol == null) return false;
+        String r = rol.trim().toUpperCase(java.util.Locale.ROOT);
+        return r.equals("ADMIN") || r.startsWith("ADMINISTRADOR");
     }
 
     public String cerrarSesion() {

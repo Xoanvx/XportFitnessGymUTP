@@ -22,6 +22,8 @@ import java.util.Map;
 public class PersonalBean implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String COD_EMP_DEFECTO = "001";
+    /** Personal del sistema: solo se puede consultar, no modificar ni eliminar. */
+    private static final java.util.Set<Integer> CODIGOS_PROTEGIDOS = java.util.Set.of(1, 2);
 
     private transient UsuarioFACADE facade = new UsuarioFACADE();
 
@@ -96,6 +98,11 @@ public class PersonalBean implements Serializable {
 
     public String guardar() {
         if (personal == null) personal = new UsuarioDTO();
+        if (isSoloLectura()) {
+            mensaje(FacesMessage.SEVERITY_ERROR,
+                    "El personal con código " + personal.getPersonal_ID() + " es del sistema y no se puede modificar.");
+            return null;
+        }
         UsuarioDTO logueado = usuarioEnSesion();
 
         if (vacio(personal.getNombres()) || vacio(personal.getApellidoPaterno())
@@ -170,6 +177,10 @@ public class PersonalBean implements Serializable {
     }
 
     public String eliminar(int id) {
+        if (esProtegido(id)) {
+            mensaje(FacesMessage.SEVERITY_ERROR, "El personal con código " + id + " es del sistema y no se puede eliminar.");
+            return null;
+        }
         UsuarioDTO logueado = usuarioEnSesion();
         if (logueado != null && logueado.getPersonal_ID() == id) {
             mensaje(FacesMessage.SEVERITY_ERROR, "No puede eliminar su propio registro.");
@@ -195,6 +206,17 @@ public class PersonalBean implements Serializable {
     }
 
     public boolean isEdicion() { return "actualizar".equals(modo); }
+
+    /** Códigos 1 y 2: personal del sistema, solo consulta. */
+    public boolean esProtegido(int id) { return esCodigoProtegido(id); }
+
+    /** Regla compartida con el servlet legado PersonalController. */
+    public static boolean esCodigoProtegido(int id) { return CODIGOS_PROTEGIDOS.contains(id); }
+
+    /** Se está viendo un personal protegido: controles y botón Actualizar bloqueados. */
+    public boolean isSoloLectura() {
+        return isEdicion() && personal != null && esProtegido(personal.getPersonal_ID());
+    }
     public boolean isRequiereAcceso() { return requiereAcceso; }
     public void setRequiereAcceso(boolean requiereAcceso) { this.requiereAcceso = requiereAcceso; }
     public String getModo() { return modo; }

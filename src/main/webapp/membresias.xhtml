@@ -1,151 +1,213 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Suscripción de membresía.
+    Estructura basada en SisdataGimnasio/frm_RegistroMembresia:
+      Suscripción · selector de planes [F5] · Datos del socio · Observación y pago · Cronograma.
+    Por ahora es solo la estructura visual (sin conexión al controlador).
+-->
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
     xmlns:ui="jakarta.faces.facelets" xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core"
     xmlns:app="jakarta.faces.composite/components" template="/WEB-INF/templates/principal.xhtml">
-    <ui:param name="menuOpcion" value="membresias" />
-    <ui:param name="menuSubmenu" value="" />
-    <ui:define name="title">Registro Membresía | Xport Fitness Gym</ui:define>
+    <ui:param name="menuOpcion" value="suscripcionMembresia" />
+    <ui:param name="menuSubmenu" value="membresias" />
+    <ui:define name="title">Suscripción de Membresía | Xport Fitness Gym</ui:define>
     <ui:define name="styles">
-<link rel="stylesheet" href="#{request.contextPath}/css/membresias.css" />
+<!-- ?v= obliga al navegador a descargar la versión nueva (subir el número al cambiar el CSS) -->
+<link rel="stylesheet" href="#{request.contextPath}/css/membresias.css?v=20261113-3" />
     </ui:define>
     <ui:define name="content">
 <main class="main-content">
         <section class="panel">
-            <div class="titulo-modulo">
-                <i class="fa-solid fa-id-card"></i>
-                <h1>Registro Membresía</h1>
+            <!-- ===================== CABECERA ===================== -->
+            <div class="cabecera-suscripcion">
+                <div class="titulo-modulo">
+                    <i class="fa-solid fa-id-card"></i>
+                    <h1>Suscripción de Membresía</h1>
+                </div>
+                <div class="registro-info">
+                    <div class="registro-dato">
+                        <label for="nroRegistro"><i class="fa-solid fa-hashtag"></i> N° registro</label>
+                        <input type="text" id="nroRegistro" name="nroRegistro" value="00000116" readonly="readonly" />
+                    </div>
+                    <div class="registro-dato">
+                        <span class="registro-etiqueta"><i class="fa-solid fa-circle-info"></i> Estado</span>
+                        <strong class="estado-badge estado-pendiente" id="lblEstado">Pendiente</strong>
+                    </div>
+                </div>
             </div>
 
-            
-                <div class="alerta-exito"><i class="fa-solid fa-circle-check"></i>
-                    <span></span>
-                </div>
-            
+            <!-- ===================== ACCIONES SUPERIORES ===================== -->
+            <div class="barra-acciones">
+                <button type="button" class="btn-buscar" id="btnVerMembresias"><i class="fa-solid fa-list"></i> Ver membresías [F5]</button>
+                <button type="button" class="btn-buscar btn-secundario" id="btnRenovar"><i class="fa-solid fa-arrows-rotate"></i> Renovar membresía</button>
+                <span class="barra-ayuda"><i class="fa-solid fa-lightbulb"></i> Elija el plan con [F5] y busque al socio con [F6].</span>
+            </div>
 
             <div class="contenido-form">
                 <form class="form-membresia" action="#" method="post" id="formMembresia">
-                    <div class="fila">
-                        <div class="campo">
-                            <label for="nroRegistro"><i class="fa-solid fa-hashtag"></i> Nro. Registro</label>
-                            <input type="text" id="nroRegistro" name="nroRegistro" value="00000116" readonly="readonly" />
-                        </div>
-                        <div class="campo">
-                            <label for="condicion"><i class="fa-solid fa-circle-check"></i> Condición</label>
-                            <select id="condicion" name="condicion">
-                                <option value="ACTIVA">🟢 ACTIVA</option>
-                                <option value="INACTIVA">🔴 INACTIVA</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <div class="seccion-titulo"><i class="fa-solid fa-user"></i> Datos del alumno</div>
+                    <!-- ===================== SUSCRIPCIÓN ===================== -->
+                    <div class="seccion-titulo"><i class="fa-solid fa-file-signature"></i> Suscripción</div>
 
-                    <div class="fila fila-codigo">
-                        <div class="campo">
-                            <label for="codigo"><i class="fa-solid fa-barcode"></i> Código</label>
-                            <input type="text" id="codigo" name="codigo" placeholder="70012717" />
+                    <!-- Selector de planes (dataGridView1 del formulario original) -->
+                    <div class="selector-planes" id="selectorPlanes" hidden="hidden">
+                        <div class="selector-planes-titulo">
+                            <span><i class="fa-solid fa-clipboard-list"></i> Seleccione una membresía</span>
+                            <button type="button" class="selector-cerrar" id="btnCerrarPlanes" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
                         </div>
-                        <button type="button" class="btn-buscar" id="btnBuscar"><i class="fa-solid fa-magnifying-glass"></i> Buscar F6</button>
-                        <div class="campo">
-                            <label for="telefono"><i class="fa-solid fa-phone"></i> Teléfono</label>
-                            <input type="tel" id="telefono" name="telefono" placeholder="987654321" />
-                        </div>
-                    </div>
-
-                    <div class="campo campo-full">
-                        <label for="nombre"><i class="fa-solid fa-user"></i> Nombre</label>
-                        <input type="text" id="nombre" name="nombre" placeholder="Nombre completo del alumno" />
-                    </div>
-                    <div class="campo campo-full">
-                        <label for="direccion"><i class="fa-solid fa-location-dot"></i> Dirección</label>
-                        <input type="text" id="direccion" name="direccion" placeholder="Dirección del alumno" />
-                    </div>
-
-                    <div class="fila">
-                        <div class="campo">
-                            <label for="fechaNacimiento"><i class="fa-solid fa-calendar"></i> Fecha nacimiento</label>
-                            <input type="date" id="fechaNacimiento" name="fechaNacimiento" />
-                        </div>
-                        <div class="campo">
-                            <label for="fechaVencimiento"><i class="fa-solid fa-calendar-check"></i> Fecha vencimiento</label>
-                            <input type="date" id="fechaVencimiento" name="fechaVencimiento" />
+                        <div class="tabla-asistencias-scroll">
+                            <table class="tabla-asistencias tabla-planes">
+                                <thead>
+                                    <tr><th>Código</th><th>Denominación</th><th>Días</th><th>Semanas</th><th>Meses</th><th>Años</th><th>Días límite</th><th>Tarifa</th><th>Frecuencia</th><th>Estado</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-codigo="0001" data-nombre="PLAN BÁSICO" data-duracion="0 días, 0 semanas, 1 mes, 0 años" data-meses="1" data-limite="0" data-tarifa="99.00" data-frecuencia="FULL DIARIO">
+                                        <td>0001</td><td>PLAN BÁSICO</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>99.00</td><td>FULL DIARIO</td><td>Activo</td>
+                                    </tr>
+                                    <tr data-codigo="0002" data-nombre="PLAN TRIMESTRAL" data-duracion="0 días, 0 semanas, 3 meses, 0 años" data-meses="3" data-limite="36" data-tarifa="249.00" data-frecuencia="INTERDIARIO">
+                                        <td>0002</td><td>PLAN TRIMESTRAL</td><td>0</td><td>0</td><td>3</td><td>0</td><td>36</td><td>249.00</td><td>INTERDIARIO</td><td>Activo</td>
+                                    </tr>
+                                    <tr data-codigo="0003" data-nombre="PLAN ANUAL" data-duracion="0 días, 0 semanas, 0 meses, 1 año" data-meses="12" data-limite="0" data-tarifa="799.00" data-frecuencia="FULL DIARIO">
+                                        <td>0003</td><td>PLAN ANUAL</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>799.00</td><td>FULL DIARIO</td><td>Activo</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <div class="campo campo-full">
-                        <label for="responsable"><i class="fa-solid fa-user-tie"></i> Responsable</label>
-                        <select id="responsable" name="responsable">
-                            <option value="1 - ADMIN">1 - ADMIN</option>
-                            <option value="2 - RECEPCION">2 - RECEPCIÓN</option>
-                        </select>
-                    </div>
-
-                    <div class="fila fila-tres">
+                    <div class="fila fila-membresia">
                         <div class="campo">
-                            <label for="periodos"><i class="fa-solid fa-clock"></i> Periodos</label>
-                            <select id="periodos" name="periodos">
-                                <option value="MENSUAL">MENSUAL</option>
-                                <option value="TRIMESTRAL">TRIMESTRAL</option>
-                                <option value="ANUAL">ANUAL</option>
-                            </select>
+                            <label for="nombreMembresia"><i class="fa-solid fa-id-card"></i> Membresía</label>
+                            <div class="campo-compuesto">
+                                <input type="text" id="codMembresia" name="codMembresia" class="input-codigo" placeholder="Cód." readonly="readonly" />
+                                <input type="text" id="nombreMembresia" name="nombreMembresia" placeholder="Seleccione con Ver membresías [F5]" readonly="readonly" />
+                            </div>
                         </div>
                         <div class="campo">
                             <label for="diasLimite"><i class="fa-solid fa-calendar-days"></i> Días límite</label>
-                            <input type="number" id="diasLimite" name="diasLimite" value="30" min="0" />
+                            <input type="text" id="diasLimite" name="diasLimite" value="0" readonly="readonly" />
                         </div>
                         <div class="campo">
                             <label for="tarifa"><i class="fa-solid fa-dollar-sign"></i> Tarifa</label>
-                            <input type="number" id="tarifa" name="tarifa" value="100.00" min="0" step="0.01" />
+                            <input type="text" id="tarifa" name="tarifa" value="0.00" readonly="readonly" />
                         </div>
                     </div>
 
                     <div class="fila">
                         <div class="campo">
                             <label for="duracion"><i class="fa-solid fa-hourglass"></i> Duración</label>
-                            <input type="text" id="duracion" name="duracion" value="0 días, 0 semanas, 1 mes, 0 años" />
+                            <input type="text" id="duracion" name="duracion" readonly="readonly" />
                         </div>
                         <div class="campo">
                             <label for="frecuencia"><i class="fa-solid fa-repeat"></i> Frecuencia</label>
-                            <select id="frecuencia" name="frecuencia">
-                                <option value="DIARIO">DIARIO</option>
-                                <option value="SEMANAL">SEMANAL</option>
-                                <option value="MENSUAL">MENSUAL</option>
-                            </select>
+                            <input type="text" id="frecuencia" name="frecuencia" readonly="readonly" />
+                        </div>
+                    </div>
+
+                    <div class="fila">
+                        <div class="campo">
+                            <label for="fechaInicio"><i class="fa-solid fa-calendar"></i> Inicio</label>
+                            <input type="date" id="fechaInicio" name="fechaInicio" />
+                        </div>
+                        <div class="campo">
+                            <label for="fechaVencimiento"><i class="fa-solid fa-calendar-check"></i> Vencimiento</label>
+                            <input type="date" id="fechaVencimiento" name="fechaVencimiento" />
                         </div>
                     </div>
 
                     <div class="campo campo-full">
-                        <label for="observacion"><i class="fa-solid fa-comment"></i> Observación</label>
-                        <textarea id="observacion" name="observacion" rows="3" placeholder="Membresía mensual - Plan estándar"></textarea>
+                        <label for="nombreResponsable"><i class="fa-solid fa-user-tie"></i> Responsable</label>
+                        <div class="campo-compuesto">
+                            <input type="text" id="codResponsable" name="codResponsable" class="input-codigo" value="#{sessionScope.usuarioAutenticado.personal_ID}" readonly="readonly" />
+                            <input type="text" id="nombreResponsable" name="nombreResponsable" value="#{sessionScope.usuarioAutenticado.nombres} #{sessionScope.usuarioAutenticado.apellidoPaterno}" readonly="readonly" />
+                        </div>
+                    </div>
+
+                    <!-- ===================== DATOS DEL SOCIO ===================== -->
+                    <div class="seccion-titulo"><i class="fa-solid fa-user"></i> Datos del socio</div>
+
+                    <div class="fila fila-socio">
+                        <div class="campo">
+                            <label for="codigo"><i class="fa-solid fa-barcode"></i> Código</label>
+                            <input type="text" id="codigo" name="codigo" placeholder="70012717" />
+                        </div>
+                        <button type="button" class="btn-buscar" id="btnBuscar"><i class="fa-solid fa-magnifying-glass"></i> Buscar [F6]</button>
+                        <button type="button" class="btn-buscar btn-secundario" id="btnNuevoSocio"><i class="fa-solid fa-user-plus"></i> Nuevo socio [F7]</button>
+                        <div class="campo">
+                            <label for="telefono"><i class="fa-solid fa-phone"></i> Teléfono</label>
+                            <input type="tel" id="telefono" name="telefono" readonly="readonly" />
+                        </div>
+                    </div>
+
+                    <div class="campo campo-full">
+                        <label for="nombre"><i class="fa-solid fa-user"></i> Nombre</label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Nombre completo del socio" readonly="readonly" />
                     </div>
                     <div class="campo campo-full">
-                        <label for="condicionDeuda"><i class="fa-solid fa-money-bill"></i> Condición deuda</label>
-                        <input type="text" id="condicionDeuda" name="condicionDeuda" value="PAGADO" />
+                        <label for="direccion"><i class="fa-solid fa-location-dot"></i> Dirección</label>
+                        <input type="text" id="direccion" name="direccion" placeholder="Dirección del socio" readonly="readonly" />
                     </div>
 
-                    <div class="botones-form">
-                        <button type="reset" class="btn-form btn-nuevo"><i class="fa-solid fa-plus"></i> Nuevo (F2)</button>
-                        <button type="button" class="btn-form btn-pago" id="btnPago"><i class="fa-solid fa-money-bill-transfer"></i> Reportar pago (F3)</button>
-                        <button type="button" class="btn-form btn-actualizar" id="btnActualizar"><i class="fa-solid fa-rotate"></i> Actualizar (F4)</button>
-                        <button type="button" class="btn-form btn-salir" id="btnSalir"><i class="fa-solid fa-right-from-bracket"></i> Salir (Esc)</button>
+                    <!-- ===================== OBSERVACIÓN Y PAGO ===================== -->
+                    <div class="seccion-titulo"><i class="fa-solid fa-money-bill"></i> Observación y pago</div>
+
+                    <div class="fila fila-observacion">
+                        <div class="campo">
+                            <label for="observacion"><i class="fa-solid fa-comment"></i> Observación</label>
+                            <textarea id="observacion" name="observacion" rows="2" placeholder="Membresía mensual - Plan estándar"></textarea>
+                        </div>
+                        <div class="campo">
+                            <label for="condicion"><i class="fa-solid fa-circle-check"></i> Condición</label>
+                            <input type="text" id="condicion" name="condicion" value="ACTIVA" readonly="readonly" />
+                        </div>
                     </div>
-                    <p class="nota-funcionalidad">Vista de plantilla: guardar, buscar y reportar pagos requieren conectarse al controlador y a la base de datos.</p>
+
+                    <!-- Totales: Subtotal · Descuento · TOTAL -->
+                    <div class="resumen-pago">
+                        <div class="tarjeta-pago">
+                            <label for="subtotal" class="tarjeta-pago-titulo"><i class="fa-solid fa-receipt"></i> Subtotal (S/)</label>
+                            <input type="text" id="subtotal" name="subtotal" value="0.00" readonly="readonly" />
+                        </div>
+                        <div class="tarjeta-pago">
+                            <label class="tarjeta-pago-titulo check-descuento">
+                                <input type="checkbox" id="aplicarDescuento" name="aplicarDescuento" />
+                                Aplicar descuento (S/)
+                            </label>
+                            <input type="number" id="descuento" name="descuento" value="0.00" min="0" step="0.01" disabled="disabled" aria-label="Descuento" />
+                        </div>
+                        <div class="tarjeta-pago tarjeta-total">
+                            <label for="total" class="tarjeta-pago-titulo"><i class="fa-solid fa-sack-dollar"></i> TOTAL (S/)</label>
+                            <input type="text" id="total" name="total" value="0.00" readonly="readonly" />
+                        </div>
+                    </div>
+
+                    <!-- ===================== BOTONES ===================== -->
+                    <div class="botones-form">
+                        <button type="button" class="btn-form btn-nuevo" id="btnNuevo"><i class="fa-solid fa-plus"></i> Nuevo [F2]</button>
+                        <button type="button" class="btn-form btn-registrar" id="btnRegistrar"><i class="fa-solid fa-floppy-disk"></i> Registrar [F3]</button>
+                        <button type="button" class="btn-form btn-eliminar" id="btnEliminar"><i class="fa-solid fa-trash"></i> Eliminar</button>
+                        <button type="button" class="btn-form btn-pago" id="btnComprobante"><i class="fa-solid fa-receipt"></i> Generar comprobante [F4]</button>
+                        <button type="button" class="btn-form btn-actualizar" id="btnImprimir"><i class="fa-solid fa-print"></i> Imprimir [Pausa]</button>
+                        <button type="button" class="btn-form btn-salir" id="btnSalir"><i class="fa-solid fa-right-from-bracket"></i> Salir [Esc]</button>
+                    </div>
+                    <p class="nota-funcionalidad">Vista de plantilla: registrar, buscar socios y generar comprobantes requieren conectarse al controlador y a la base de datos.</p>
                 </form>
 
+                <!-- ===================== CRONOGRAMA ===================== -->
                 <aside class="asistencias-card">
-                    <div class="asistencias-titulo"><i class="fa-solid fa-calendar-check"></i><span>ASISTENCIAS</span></div>
+                    <div class="asistencias-titulo"><i class="fa-solid fa-calendar-check"></i><span>CRONOGRAMA</span></div>
                     <div class="tabla-asistencias-scroll">
                         <table class="tabla-asistencias">
-                            <thead><tr><th>Día</th><th>Horario ingreso</th><th>Fecha ingreso</th></tr></thead>
-                            <tbody>
-                                <tr><td>1</td><td>08:10:00</td><td>01/08/2026</td></tr>
-                                <tr><td>2</td><td>08:00:00</td><td>03/09/2026</td></tr>
-                                <tr><td>3</td><td>08:10:00</td><td>05/09/2026</td></tr>
-                                <tr><td>4</td><td>08:10:00</td><td>08/09/2026</td></tr>
-                                <tr><td>5</td><td>08:14:00</td><td>10/09/2026</td></tr>
-                                <tr><td>6</td><td>08:10:00</td><td>12/09/2026</td></tr>
-                                <tr><td>7</td><td>08:10:00</td><td>15/09/2026</td></tr>
-                                <tr><td>8</td><td>08:12:00</td><td>18/09/2026</td></tr>
+                            <thead><tr><th>Clase</th><th>Día</th><th>Marcado</th></tr></thead>
+                            <tbody id="cronograma">
+                                <tr><td>CLASE</td><td>1</td><td>SI</td></tr>
+                                <tr><td>CLASE</td><td>2</td><td>SI</td></tr>
+                                <tr><td>CLASE</td><td>3</td><td>SI</td></tr>
+                                <tr><td>CLASE</td><td>4</td><td>NO</td></tr>
+                                <tr><td>CLASE</td><td>5</td><td>NO</td></tr>
+                                <tr><td>CLASE</td><td>6</td><td>NO</td></tr>
+                                <tr><td>CLASE</td><td>7</td><td>NO</td></tr>
+                                <tr><td>CLASE</td><td>8</td><td>NO</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -155,6 +217,6 @@
     </main>
     </ui:define>
     <ui:define name="scripts">
-<script src="#{request.contextPath}/js/membresias.js"></script>
+<script src="#{request.contextPath}/js/membresias.js?v=20261113-3"></script>
     </ui:define>
 </ui:composition>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Cambio de contraseña de usuario (CambiarClaveBean -> UsuarioFACADE.PersonalUsuario_ActualizaClaveF).
+-->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="jakarta.faces.facelets" xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core"
+    xmlns:a="jakarta.faces.passthrough"
+    template="/WEB-INF/templates/principal.xhtml">
+    <ui:param name="menuOpcion" value="cambiarClave" />
+    <ui:param name="menuSubmenu" value="" />
+    <ui:define name="title">Cambiar contraseña | Xport Fitness Gym</ui:define>
+    <ui:define name="styles">
+        <link rel="stylesheet" href="#{request.contextPath}/css/cambiarclave.css?v=2" />
+    </ui:define>
+    <ui:define name="content">
+        <main class="clave-main">
+            <section class="clave-card">
+                <div class="clave-cabecera">
+                    <div class="clave-icono"><i class="fa-solid fa-key"></i></div>
+                    <h1>Cambiar contraseña</h1>
+                    <p>#{cambiarClaveBean.administrador ? 'Seleccione el usuario y escriba su nueva contraseña.' : 'Actualice la contraseña con la que ingresa al sistema.'}</p>
+                </div>
+
+                <h:form id="formClave" prependId="false" styleClass="clave-cuerpo">
+
+                    <h:messages globalOnly="true" layout="list" styleClass="clave-mensajes"
+                                errorClass="msg-error" infoClass="msg-ok" />
+
+                    <!-- USUARIO -->
+                    <div class="clave-campo">
+                        <label for="#{cambiarClaveBean.administrador ? 'personal' : 'personalFijo'}">Usuario</label>
+                        <div class="clave-input">
+                            <i class="fa-solid fa-user icono-campo"></i>
+                            <h:selectOneMenu id="personal" value="#{cambiarClaveBean.personalId}"
+                                             rendered="#{cambiarClaveBean.administrador}">
+                                <f:selectItems value="#{cambiarClaveBean.usuarios}" var="u"
+                                               itemValue="#{u.personal_ID}"
+                                               itemLabel="#{u.usuario} - #{u.nombres} #{u.apellidoPaterno}" />
+                                <f:ajax execute="@this" render="bloqueActual" />
+                            </h:selectOneMenu>
+                            <h:inputText id="personalFijo" value="#{cambiarClaveBean.usuarioSesion}" readonly="true"
+                                         rendered="#{not cambiarClaveBean.administrador}" />
+                        </div>
+                    </div>
+
+                    <!-- CONTRASEÑA ACTUAL (solo para cambiar la propia) -->
+                    <h:panelGroup id="bloqueActual" layout="block">
+                        <h:panelGroup layout="block" styleClass="clave-campo" rendered="#{cambiarClaveBean.propia}">
+                            <label for="claveActual">Contraseña actual</label>
+                            <div class="clave-input">
+                                <i class="fa-solid fa-lock icono-campo"></i>
+                                <h:inputSecret id="claveActual" value="#{cambiarClaveBean.claveActual}" redisplay="false"
+                                               a:autocomplete="current-password" a:placeholder="Su contraseña actual" />
+                                <button type="button" class="ver-clave" data-objetivo="claveActual" title="Mostrar contraseña"><i class="fa-solid fa-eye"></i></button>
+                            </div>
+                        </h:panelGroup>
+                    </h:panelGroup>
+
+                    <div class="clave-separador">Nueva contraseña</div>
+
+                    <!-- NUEVA CONTRASEÑA -->
+                    <div class="clave-campo">
+                        <label for="claveNueva">Nueva contraseña</label>
+                        <div class="clave-input">
+                            <i class="fa-solid fa-key icono-campo"></i>
+                            <h:inputSecret id="claveNueva" value="#{cambiarClaveBean.claveNueva}" redisplay="false"
+                                           a:autocomplete="new-password" a:minlength="6" a:placeholder="Mínimo 6 caracteres" />
+                            <button type="button" class="ver-clave" data-objetivo="claveNueva" title="Mostrar contraseña"><i class="fa-solid fa-eye"></i></button>
+                        </div>
+                        <div class="fuerza" id="fuerzaClave" data-nivel="0" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+                        <span class="clave-ayuda" id="textoFuerza">Use letras y números. No distingue mayúsculas de minúsculas.</span>
+                    </div>
+
+                    <div class="clave-campo">
+                        <label for="claveConfirmacion">Confirmar contraseña</label>
+                        <div class="clave-input">
+                            <i class="fa-solid fa-check-double icono-campo"></i>
+                            <h:inputSecret id="claveConfirmacion" value="#{cambiarClaveBean.claveConfirmacion}" redisplay="false"
+                                           a:autocomplete="new-password" a:placeholder="Repita la nueva contraseña" />
+                            <button type="button" class="ver-clave" data-objetivo="claveConfirmacion" title="Mostrar contraseña"><i class="fa-solid fa-eye"></i></button>
+                        </div>
+                        <span class="coincide" id="coincideClave"></span>
+                    </div>
+
+                    <div class="clave-botones">
+                        <h:commandButton value="Cancelar" action="#{cambiarClaveBean.cancelar}" immediate="true" styleClass="clave-btn clave-btn-cancelar" />
+                        <h:commandButton value="Guardar contraseña" action="#{cambiarClaveBean.guardar}" styleClass="clave-btn clave-btn-guardar" />
+                    </div>
+                </h:form>
+            </section>
+        </main>
+    </ui:define>
+    <ui:define name="scripts">
+        <script src="#{request.contextPath}/js/cambiarclave.js?v=2"></script>
+    </ui:define>
+</ui:composition>

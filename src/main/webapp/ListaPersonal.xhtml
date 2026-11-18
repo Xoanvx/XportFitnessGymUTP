@@ -7,7 +7,7 @@
     <ui:define name="title">Personal | Xport Fitness Gym</ui:define>
     <ui:define name="styles">
         <link rel="stylesheet" href="#{request.contextPath}/css/listaclientes.css" />
-        <style type="text/css"><![CDATA[
+        <style type="text/css">
             .acciones-personal{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
             .link-editar,.btn-eliminar{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:12px;padding:7px 10px;border-radius:6px;border:0;text-decoration:none;cursor:pointer}
             .link-editar{color:#2864f0;background:#eaf0ff}.link-editar:hover{background:#2864f0;color:#fff}
@@ -16,7 +16,7 @@
             .estado-activo{background:#dcfce7;color:#15803d}.estado-inactivo{background:#f1f5f9;color:#64748b}
             .sin-acceso{color:#94a3b8;font-style:italic}.mensaje-ok{display:block;padding:11px 14px;border-radius:8px;margin-bottom:16px;background:#dcfce7;color:#166534;font-size:13px}
             @media(max-width:800px){.tabla-clientes{min-width:950px}}
-        ]]></style>
+        </style>
     </ui:define>
     <ui:define name="content">
         <main class="dashboard-main">
@@ -28,7 +28,7 @@
                 <h:messages globalOnly="true" layout="list" />
                 <h:panelGroup layout="block" rendered="#{not empty flash.mensajePersonalJSF}" styleClass="mensaje-ok"><i class="fa-solid fa-circle-check"></i> <h:outputText value="#{flash.mensajePersonalJSF}" /></h:panelGroup>
                 <div class="clientes-resumen"><div><i class="fa-solid fa-address-book"></i><span>Listado de personal</span></div><span class="clientes-total">Registros: <strong>#{personalBean.listaPersonal.size()}</strong></span></div>
-                <div class="clientes-tabla-scroll">
+                <div class="clientes-tabla-scroll" data-paginar="trabajadores">
                     <h:dataTable value="#{personalBean.listaPersonal}" var="p" styleClass="tabla-clientes" rendered="#{not empty personalBean.listaPersonal}">
                         <h:column><f:facet name="header">Código</f:facet><h:outputText value="#{p.personal_ID}" /></h:column>
                         <h:column><f:facet name="header">Apellidos y Nombres</f:facet><span class="cliente-razon"><h:outputText value="#{p.apellidoPaterno} #{p.apellidoMaterno}, #{p.nombres}" /></span></h:column>
@@ -39,8 +39,8 @@
                         <h:column><f:facet name="header">Rol</f:facet><h:outputText value="#{p.rol}" /></h:column>
                         <h:column><f:facet name="header">Estado</f:facet><span class="estado-badge #{p.estadoGene eq 'Activo' ? 'estado-activo' : 'estado-inactivo'}"><h:outputText value="#{p.estadoGene}" /></span></h:column>
                         <h:column><f:facet name="header">Opciones</f:facet><div class="acciones-personal">
-                            <h:form prependId="false"><h:commandLink action="#{personalBean.editar(p.personal_ID)}" styleClass="link-editar"><i class="fa-solid fa-pen-to-square"></i> Editar</h:commandLink></h:form>
-                            <h:form prependId="false" rendered="#{p.personal_ID ne sessionScope.usuarioAutenticado.personal_ID}">
+                            <h:form prependId="false"><h:commandLink action="#{personalBean.editar(p.personal_ID)}" styleClass="link-editar" title="#{personalBean.esProtegido(p.personal_ID) ? 'Personal del sistema: solo consulta' : 'Editar'}"><i class="fa-solid #{personalBean.esProtegido(p.personal_ID) ? 'fa-eye' : 'fa-pen-to-square'}"></i> #{personalBean.esProtegido(p.personal_ID) ? 'Ver' : 'Editar'}</h:commandLink></h:form>
+                            <h:form prependId="false" rendered="#{p.personal_ID ne sessionScope.usuarioAutenticado.personal_ID and not personalBean.esProtegido(p.personal_ID)}">
                                 <h:commandButton action="#{personalBean.eliminar(p.personal_ID)}" value="Eliminar" styleClass="btn-eliminar" onclick="return confirm('¿Eliminar este registro? Si tiene movimientos, se marcará como inactivo.');" />
                             </h:form>
                         </div></h:column>

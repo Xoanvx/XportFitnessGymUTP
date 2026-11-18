@@ -1,0 +1,18 @@
+# Plantilla de configuracion de la base de datos de Xport Fitness Gym.
+# Copiar como "gimnasio-bd.properties" (sin .ejemplo) en UNA de estas rutas:
+#   - Servidor Tomcat:  <carpeta de Tomcat>/conf/gimnasio-bd.properties
+#   - PC de desarrollo: C:\Users\<usuario>\gimnasio-bd.properties
+#   - Cualquier ruta, indicandola en la variable de entorno GYM_DB_CONFIG
+# Tambien se pueden usar variables de entorno: GYM_DB_URL, GYM_DB_USER, GYM_DB_PASSWORD.
+gym.db.url=jdbc:sqlserver://SERVIDOR;instanceName=INSTANCIA;databaseName=BDGimnasio;encrypt=false;trustServerCertificate=true
+gym.db.user=USUARIO
+gym.db.password=CONTRASENA
+
+# Correo para "¿Has olvidado tu clave?" (SMTP). Sin estas claves la opción avisa que no está disponible.
+# Puerto 587 con STARTTLS (gym.mail.ssl=false) o 465 con SSL (gym.mail.ssl=true).
+gym.mail.host=mail.sisdataperu.com
+gym.mail.port=465
+gym.mail.ssl=true
+gym.mail.user=CUENTA@sisdataperu.com
+gym.mail.password=CONTRASENA_DEL_CORREO
+gym.mail.from=CUENTA@sisdataperu.com

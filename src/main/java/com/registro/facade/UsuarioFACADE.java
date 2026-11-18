@@ -78,4 +78,9 @@ public class UsuarioFACADE {
     public List<AreaDTO> ListaAreas() {
         return usuarioDAO.ListaAreas();
     }
+    
+    public boolean PersonalUsuario_ActualizaClaveF(UsuarioDTO usuario)
+    {
+        return usuarioDAO.PersonalUsuario_ActualizaClave(usuario);
+    }
 }

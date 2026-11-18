@@ -8,7 +8,7 @@ package com.registro.dto;
  *
  * @author Ing
  */
-public class CategoriaDTO {
+public class CategoriaDTO implements java.io.Serializable {
     
     private int Categoria_ID;
     private String Nombre;

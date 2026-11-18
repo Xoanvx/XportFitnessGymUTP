@@ -8,6 +8,7 @@ import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,6 +28,12 @@ public class ClienteBean implements Serializable {
     private List<ClienteDTO> listaClientes;
     private String modo = "grabar";
 
+    // Paginación del listado (la lista se consulta una vez y se muestra por partes)
+    private static final int[] TAMANOS_PAGINA = {10, 25, 50, 100};
+    private static final int PAGINAS_VISIBLES = 5;
+    private int pagina = 1;
+    private int tamPagina = 10;
+
     @PostConstruct
     public void init() {
         prepararNuevo(false);
@@ -42,6 +49,66 @@ public class ClienteBean implements Serializable {
             }
         }
         return listaClientes;
+    }
+
+    /** Solo los socios de la página actual. */
+    public List<ClienteDTO> getClientesPagina() {
+        List<ClienteDTO> todos = getListaClientes();
+        if (todos.isEmpty()) return todos;
+        int desde = (getPagina() - 1) * tamPagina;
+        int hasta = Math.min(desde + tamPagina, todos.size());
+        return todos.subList(desde, hasta);
+    }
+
+    public int getTotalRegistros() { return getListaClientes().size(); }
+
+    public int getTotalPaginas() {
+        return Math.max(1, (getTotalRegistros() + tamPagina - 1) / tamPagina);
+    }
+
+    /** Página actual, siempre dentro del rango válido. */
+    public int getPagina() {
+        if (pagina > getTotalPaginas()) pagina = getTotalPaginas();
+        if (pagina < 1) pagina = 1;
+        return pagina;
+    }
+
+    public void setPagina(int pagina) { this.pagina = pagina; }
+
+    public int getTamPagina() { return tamPagina; }
+
+    public void setTamPagina(int tam) {
+        for (int permitido : TAMANOS_PAGINA) {
+            if (permitido == tam) {
+                if (tam != tamPagina) pagina = 1;   // al cambiar el tamaño se vuelve al inicio
+                tamPagina = tam;
+                return;
+            }
+        }
+    }
+
+    public List<Integer> getTamanosPagina() {
+        List<Integer> tamanos = new ArrayList<>();
+        for (int t : TAMANOS_PAGINA) tamanos.add(t);
+        return tamanos;
+    }
+
+    /** Número del primer registro mostrado (1, 11, 21...). */
+    public int getDesde() {
+        return getTotalRegistros() == 0 ? 0 : (getPagina() - 1) * tamPagina + 1;
+    }
+
+    public int getHasta() { return Math.min(getPagina() * tamPagina, getTotalRegistros()); }
+
+    /** Números de página a mostrar alrededor de la actual (máximo 5). */
+    public List<Integer> getPaginasVisibles() {
+        int total = getTotalPaginas();
+        int inicio = Math.max(1, getPagina() - PAGINAS_VISIBLES / 2);
+        int fin = Math.min(total, inicio + PAGINAS_VISIBLES - 1);
+        inicio = Math.max(1, fin - PAGINAS_VISIBLES + 1);
+        List<Integer> paginas = new ArrayList<>();
+        for (int i = inicio; i <= fin; i++) paginas.add(i);
+        return paginas;
     }
 
     public String nuevo() {

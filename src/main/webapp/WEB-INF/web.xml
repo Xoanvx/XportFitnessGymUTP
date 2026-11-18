@@ -4,9 +4,11 @@
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
     <display-name>Xport Fitness Gym - Jakarta Faces</display-name>
+    <!-- Production: no muestra detalles técnicos de errores a los usuarios.
+         Para depurar en la PC local se puede cambiar temporalmente a Development. -->
     <context-param>
         <param-name>jakarta.faces.PROJECT_STAGE</param-name>
-        <param-value>Development</param-value>
+        <param-value>Production</param-value>
     </context-param>
     <listener>
         <listener-class>org.jboss.weld.environment.servlet.Listener</listener-class>

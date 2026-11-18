@@ -45,6 +45,54 @@ html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;backgr
 .tabla-asistencias th{background:#DDEAFF;color:#18345F;text-align:left;text-transform:uppercase;padding:9px 6px;font-size:10px}
 .tabla-asistencias td{padding:8px 7px;border-bottom:1px solid #EDF1F6;white-space:nowrap;color:#29466E}
 .alerta-exito{display:flex;gap:8px;align-items:center;background:#E8F8EF;color:#167344;border:1px solid #B7E8CB;padding:10px 13px;border-radius:8px;margin-bottom:16px}
+/* ===== Estructura frm_RegistroMembresia ===== */
+.cabecera-suscripcion{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 16px}
+.cabecera-suscripcion .titulo-modulo{margin:0}
+.registro-info{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.registro-dato{display:flex;align-items:center;gap:9px;border:1px solid #E0E6EF;background:#F8FAFD;border-radius:10px;padding:6px 8px 6px 12px;min-height:44px}
+.registro-dato label,.registro-etiqueta{font-size:12px;font-weight:700;color:#263B60;white-space:nowrap}
+.registro-dato label i,.registro-etiqueta i{color:var(--blue);margin-right:3px}
+.registro-dato input{width:110px;border:1px solid #CFD7E2;border-radius:7px;background:#fff;padding:6px 9px;color:#10234D;font:700 13px Arial,Helvetica,sans-serif;text-align:center;outline:none}
+.barra-acciones{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#F8FAFD;border:1px solid #E0E6EF;border-radius:11px;padding:10px 12px;margin:0 0 20px}
+.barra-ayuda{margin-left:auto;font-size:12px;color:var(--muted)}
+.barra-ayuda i{color:#F2B705;margin-right:5px}
+.fila-observacion{grid-template-columns:minmax(0,2fr) minmax(0,1fr);align-items:start}
+.fila-observacion textarea{min-height:37px;height:37px}
+.resumen-pago{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.tarjeta-pago{display:flex;flex-direction:column;gap:8px;border:1px solid #E0E6EF;background:#F8FAFD;border-radius:11px;padding:12px 14px;min-width:0}
+.tarjeta-pago-titulo{display:flex;align-items:center;gap:7px;min-height:18px;font-size:12px;font-weight:700;color:#263B60;text-transform:uppercase;letter-spacing:.3px}
+.tarjeta-pago-titulo i{color:var(--blue)}
+.tarjeta-pago input[type=text],.tarjeta-pago input[type=number]{width:100%;min-width:0;border:1px solid #CFD7E2;border-radius:8px;background:#fff;padding:8px 11px;color:#10234D;font:700 18px Arial,Helvetica,sans-serif;text-align:right;outline:none}
+.tarjeta-pago input:disabled{background:#F1F4F9;color:#94A3B8}
+.tarjeta-pago input[type=number]:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(40,100,240,.11)}
+.check-descuento{cursor:pointer}
+.check-descuento input{accent-color:var(--blue);width:15px;height:15px;margin:0}
+.tarjeta-total{background:var(--navy);border-color:var(--navy)}
+.tarjeta-total .tarjeta-pago-titulo,.tarjeta-total .tarjeta-pago-titulo i{color:#fff}
+.tarjeta-total input[type=text]{background:transparent;border-color:rgba(255,255,255,.25);color:#fff;font-size:22px}
+.btn-secundario{background:#fff;color:var(--blue);border:1px solid #CFD7E2}
+.btn-secundario:hover{background:#EFF5FF;color:var(--blue-dark)}
+.estado-badge{display:inline-flex;align-items:center;padding:5px 12px;border-radius:999px;font-size:11px;letter-spacing:.4px;text-transform:uppercase}
+.estado-pendiente{background:#FFF4DB;color:#A15C07}
+.estado-activa{background:#E8F8EF;color:#167344}
+.estado-vencida{background:#FDECEC;color:#B42318}
+.selector-planes{border:1px solid #CFDDF5;background:#F8FAFD;border-radius:11px;padding:12px}
+.selector-planes[hidden]{display:none}
+.selector-planes-titulo{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;color:#16305D;text-transform:uppercase}
+.selector-planes-titulo i{color:var(--blue);margin-right:6px}
+.selector-cerrar{border:0;background:transparent;color:#64748B;font-size:15px;cursor:pointer;padding:4px 6px;border-radius:6px}
+.selector-cerrar:hover{background:#E4EBF5;color:#10234D}
+.tabla-planes{min-width:640px}
+.tabla-planes tbody tr{cursor:pointer}
+.tabla-planes tbody tr:hover td{background:#EFF5FF}
+.tabla-planes tbody tr.seleccionado td{background:#DDEAFF;font-weight:700}
+.fila-membresia{grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr)}
+.campo-compuesto{display:flex;gap:8px;min-width:0}
+.campo-compuesto .input-codigo{flex:0 0 78px;text-align:center}
+.fila-socio{grid-template-columns:minmax(0,1fr) auto auto minmax(0,1fr);align-items:end}
+.botones-form{grid-template-columns:repeat(3,minmax(0,1fr))}
+.btn-registrar{background:#16A34A}.btn-eliminar{background:#64748B}
 @media(max-width:1250px){.contenido-form{grid-template-columns:minmax(0,1fr)}.asistencias-card{max-width:100%}.tabla-asistencias{min-width:380px}}
 @media(max-width:900px){.dashboard-container{display:block}.sidebar{width:100%;min-height:auto;padding:15px}.saludo-admin h2{margin-bottom:14px}.sidebar-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}.sidebar-menu li{margin:0}.sidebar-menu2{display:flex;gap:8px;margin-top:12px;padding-top:10px}.main-content{padding:12px}.panel{padding:17px}}
-@media(max-width:620px){.fila,.fila-tres,.fila-codigo{grid-template-columns:1fr}.btn-buscar{width:100%}.botones-form{grid-template-columns:repeat(2,minmax(0,1fr))}.titulo-modulo h1{font-size:19px}}
+@media(max-width:900px){.fila-socio{grid-template-columns:minmax(0,1fr) auto auto}.fila-socio>.campo:last-child{grid-column:1/-1}.barra-ayuda{margin-left:0;width:100%}}
+@media(max-width:620px){.fila,.fila-tres,.fila-codigo,.fila-membresia,.fila-socio,.fila-observacion,.resumen-pago{grid-template-columns:1fr}.barra-acciones .btn-buscar{flex:1 1 100%}.btn-buscar{width:100%}.botones-form{grid-template-columns:repeat(2,minmax(0,1fr))}.titulo-modulo h1{font-size:19px}}

@@ -22,6 +22,10 @@ import java.util.List;
   // SUSCRIPCIONES DE MEMBRESIAS
   // ---------------------------------------------------------
 public class MembresiaDAO {
+
+    /** Códigos RETURN de los procedimientos de suscripción. */
+    public static final int SP_OK = 0;
+    public static final int SP_ERROR = -1;
     
     public ArrayList<MembresiaDTO> Consulta_HistorialMembresias()
     {
@@ -33,7 +37,7 @@ public class MembresiaDAO {
         try
         {
             cn = ConexionBD.obtenerConexion();
-            String sql = "{sp_Consulta_HistorialMembresias(?,?,?,?)}";
+            String sql = "{call sp_Consulta_HistorialMembresias(?,?,?,?)}";
             st= cn.prepareCall(sql);
             
             while(rs.next())
@@ -87,7 +91,7 @@ public class MembresiaDAO {
         try
         {
             cn = ConexionBD.obtenerConexion();
-            String sql = "{sp_generasuscripciones_Membresia(?)}";            
+            String sql = "{call sp_generasuscripciones_Membresia(?)}";            
             st= cn.prepareCall(sql);
             st.setString(1, CodEmp);
             
@@ -96,7 +100,8 @@ public class MembresiaDAO {
             if(rs.next())
             {
                 genera= new MembresiaDTO();
-                genera.setCodigoM(rs.getString("NroSuscripcion_id"));
+                // El SP devuelve una columna sin nombre con el siguiente número
+                genera.setNroSuscripcion_id(rs.getString(1));
             }
         }
         catch(SQLException ex)
@@ -131,7 +136,7 @@ public class MembresiaDAO {
         try
         {
             cn= ConexionBD.obtenerConexion();
-            String sql = "{sp_Listasuscripciones_MembresiaXRegistro(?,?)}";
+            String sql = "{call sp_Listasuscripciones_MembresiaXRegistro(?,?)}";
             st = cn.prepareCall(sql);
             
             st.setString(1, CodEmp);
@@ -189,26 +194,29 @@ public class MembresiaDAO {
         try
         {
             cn = ConexionBD.obtenerConexion();
-            String sql = "{sp_InsertSuscripciones_Membresia(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            // El SP inserta o actualiza (según NroSuscripcion_id) y genera el detalle de clases.
+            // Usa SET NOCOUNT ON y devuelve RETURN 0 (éxito) / -1 (error).
+            String sql = "{? = call sp_InsertSuscripciones_Membresia(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             cs = cn.prepareCall(sql);
-            
-            cs.setString(1,membresias.getNroSuscripcion_id());
-            cs.setString(2,membresias.getCliente());
-            cs.setString(3,membresias.getCodigoM());
-            cs.setDate(4,membresias.getFechaInicio());
-            cs.setDate(1,membresias.getFechaFin());
-            cs.setInt(6,membresias.getPersonal_ID());
-            cs.setDouble(7,membresias.getSubTotal());
-            cs.setDouble(8,membresias.getDescuento());
-            cs.setDouble(9,membresias.getTotal());
-            cs.setInt(10,membresias.getDias());
-            cs.setString(11,membresias.getEstadoSusc());
-            cs.setString(12,membresias.getCondicionSusc());
-            cs.setString(13,membresias.getObservacionSusc());
-            cs.setString(14,membresias.getCodEmp());
-            
-            int filasAfectadas = cs.executeUpdate();
-            if(filasAfectadas > 0) ResultadoExitoso = true;
+
+            cs.registerOutParameter(1, Types.INTEGER);
+            cs.setString(2,membresias.getNroSuscripcion_id());
+            cs.setString(3,membresias.getcliente_id());
+            cs.setString(4,membresias.getCodigoM());
+            cs.setDate(5,membresias.getFechaInicio());
+            cs.setDate(6,membresias.getFechaFin());
+            cs.setInt(7,membresias.getPersonal_ID());
+            cs.setDouble(8,membresias.getSubTotal());
+            cs.setDouble(9,membresias.getDescuento());
+            cs.setDouble(10,membresias.getTotalSusc());
+            cs.setInt(11,membresias.getDias());
+            cs.setString(12,membresias.getEstadoSusc());
+            cs.setString(13,membresias.getCondicionSusc());
+            cs.setString(14,membresias.getObservacionSusc());
+            cs.setString(15,membresias.getCodEmp());
+
+            cs.execute();
+            ResultadoExitoso = cs.getInt(1) == SP_OK;
         }
         catch(SQLException ex)
         {
@@ -240,14 +248,17 @@ public class MembresiaDAO {
         try
         {
             cn = ConexionBD.obtenerConexion();
-            String sql = "{sp_Eliminasuscripciones_Membresia(?,?)}";
+            // Elimina el detalle de clases y la suscripción en una transacción.
+            // Usa SET NOCOUNT ON y devuelve RETURN 0 (éxito) / -1 (error).
+            String sql = "{? = call sp_Eliminasuscripciones_Membresia(?,?)}";
             cs = cn.prepareCall(sql);
-            
-            cs.setString(1,membresias.getCodEmp());
-            cs.setString(2,membresias.getNroSuscripcion_id());
-            
-            int filasAfectadas = cs.executeUpdate();
-            if(filasAfectadas > 0) ResultadoExitoso = true;
+
+            cs.registerOutParameter(1, Types.INTEGER);
+            cs.setString(2,membresias.getCodEmp());
+            cs.setString(3,membresias.getNroSuscripcion_id());
+
+            cs.execute();
+            ResultadoExitoso = cs.getInt(1) == SP_OK;
         }
         catch(SQLException ex)
         {
@@ -279,7 +290,7 @@ public class MembresiaDAO {
         try
         {
             cn= ConexionBD.obtenerConexion();
-            String sql = "{sp_ListaDetSuscripcionPeriodoClases(?,?)}";
+            String sql = "{call sp_ListaDetSuscripcionPeriodoClases(?,?)}";
             st = cn.prepareCall(sql);
             
             st.setString(1, NroSuscripcion_id);
@@ -325,9 +336,9 @@ public class MembresiaDAO {
   // PLANES DE MEMBRESIAS
   // ---------------------------------------------------------
     
-    public MembresiaDTO ListaFrecuencia()
+    public ArrayList<MembresiaDTO> ListaFrecuencia()
     {
-        MembresiaDTO lista = null;
+        ArrayList<MembresiaDTO> lista = new ArrayList<>();
         Connection cn = null;
         CallableStatement st = null;
         ResultSet rs = null;
@@ -335,19 +346,20 @@ public class MembresiaDAO {
         try
         {
             cn= ConexionBD.obtenerConexion();
-            String sql = "{sp_ListaFrecuencia()}";
+            String sql = "{call sp_ListaFrecuencia()}";
             st = cn.prepareCall(sql);
             
             rs = st.executeQuery();
             
-            if(rs.next())
+            while(rs.next())
             {
-                lista = new MembresiaDTO();
-                
-                lista.setIDFrecuencia(rs.getInt("IDFrecuencia"));
-                lista.setFrecuencia(rs.getString("Frecuencia"));
-                lista.setEstado(rs.getString("Estado"));
+                MembresiaDTO frecuencia = new MembresiaDTO();
 
+                frecuencia.setIDFrecuencia(rs.getInt("IDFrecuencia"));
+                frecuencia.setFrecuencia(rs.getString("Frecuencia"));
+                frecuencia.setEstado(rs.getString("Estado"));
+
+                lista.add(frecuencia);
             }
         }
         catch(SQLException ex)
@@ -371,36 +383,38 @@ public class MembresiaDAO {
         
         return  lista; 
     }
-    public MembresiaDTO ListaMembresia()
+    public ArrayList<MembresiaDTO> ListaMembresia()
     {
-        MembresiaDTO lista = null;
+        ArrayList<MembresiaDTO> lista = new ArrayList<>();
         Connection cn = null;
         CallableStatement st = null;
         ResultSet rs = null;
-        
+
         try
         {
             cn= ConexionBD.obtenerConexion();
-            String sql = "{sp_ListaMembresia()}";
+            String sql = "{call sp_ListaMembresia()}";
             st = cn.prepareCall(sql);
-            
+
             rs = st.executeQuery();
-            
-            if(rs.next())
+
+            while(rs.next())
             {
-                lista = new MembresiaDTO();
-                
-                lista.setCodigoM(rs.getString("CodigoM"));
-                lista.setNombreMembresia(rs.getString("NombreMembresia"));
-                lista.setDuracionDias(rs.getInt("Duracion_Dias"));
-                lista.setDuracionSemanas(rs.getInt("Duracion_Semanas"));
-                lista.setDuracionMeses(rs.getInt("Duracion_Meses"));
-                lista.setDuracionAnios(rs.getInt("Duracion_Anios"));
-                lista.setDiasLimite(rs.getInt("DiasLimite"));
-                lista.setTarifa(rs.getDouble("Tarifa"));
-                lista.setIDFrecuencia(rs.getInt("IDFrecuencia"));
-                lista.setFrecuencia(rs.getString("Frecuencia"));
-                lista.setEstado(rs.getString("Estado"));
+                MembresiaDTO plan = new MembresiaDTO();
+
+                plan.setCodigoM(rs.getString("CodigoM"));
+                plan.setNombreMembresia(rs.getString("NombreMembresia"));
+                plan.setDuracionDias(rs.getInt("Duracion_Dias"));
+                plan.setDuracionSemanas(rs.getInt("Duracion_Semanas"));
+                plan.setDuracionMeses(rs.getInt("Duracion_Meses"));
+                plan.setDuracionAnios(rs.getInt("Duracion_Anios"));
+                plan.setDiasLimite(rs.getInt("DiasLimite"));
+                plan.setTarifa(rs.getDouble("Tarifa"));
+                plan.setIDFrecuencia(rs.getInt("IDFrecuencia"));
+                plan.setFrecuencia(rs.getString("Frecuencia"));
+                plan.setEstado(rs.getString("Estado"));
+
+                lista.add(plan);
             }
         }
         catch(SQLException ex)
@@ -425,6 +439,103 @@ public class MembresiaDAO {
         return  lista; 
     }
     
+    public MembresiaDTO ListaMembresiaXCod(String CodigoM)
+    {
+        MembresiaDTO plan = null;
+        Connection cn = null;
+        CallableStatement st = null;
+        ResultSet rs = null;
+
+        try
+        {
+            cn= ConexionBD.obtenerConexion();
+            String sql = "{call sp_ListaMembresiaXCod(?)}";
+            st = cn.prepareCall(sql);
+            st.setString(1, CodigoM);
+
+            rs = st.executeQuery();
+
+            if(rs.next())
+            {
+                plan = new MembresiaDTO();
+
+                plan.setCodigoM(rs.getString("CodigoM"));
+                plan.setNombreMembresia(rs.getString("NombreMembresia"));
+                plan.setDuracionDias(rs.getInt("Duracion_Dias"));
+                plan.setDuracionSemanas(rs.getInt("Duracion_Semanas"));
+                plan.setDuracionMeses(rs.getInt("Duracion_Meses"));
+                plan.setDuracionAnios(rs.getInt("Duracion_Anios"));
+                plan.setDiasLimite(rs.getInt("DiasLimite"));
+                plan.setTarifa(rs.getDouble("Tarifa"));
+                plan.setIDFrecuencia(rs.getInt("IDFrecuencia"));
+                plan.setFrecuencia(rs.getString("Frecuencia"));
+                plan.setEstado(rs.getString("Estado"));
+            }
+        }
+        catch(SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                if(cn!=null)cn.close();
+                if(st != null)st.close();
+                if(rs != null)rs.close();
+            }
+            catch(SQLException ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+
+        return plan;
+    }
+
+    /** Siguiente código de plan (sp_autogenera_codMembresia), p. ej. "0005". */
+    public String autogeneraCodMembresia()
+    {
+        String codigo = null;
+        Connection cn = null;
+        CallableStatement st = null;
+        ResultSet rs = null;
+
+        try
+        {
+            cn= ConexionBD.obtenerConexion();
+            String sql = "{call sp_autogenera_codMembresia}";
+            st = cn.prepareCall(sql);
+
+            rs = st.executeQuery();
+
+            if(rs.next())
+            {
+                // El SP devuelve una columna sin nombre
+                codigo = rs.getString(1);
+            }
+        }
+        catch(SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                if(cn!=null)cn.close();
+                if(st != null)st.close();
+                if(rs != null)rs.close();
+            }
+            catch(SQLException ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+
+        return codigo;
+    }
+
     public MembresiaDTO Listasuscripciones_MembresiaXCodMembresia(String CodEmp, String CodigoM)
     {
         MembresiaDTO lista = null;
@@ -435,7 +546,7 @@ public class MembresiaDAO {
         try
         {
             cn= ConexionBD.obtenerConexion();
-            String sql = "{sp_Listasuscripciones_MembresiaXCodMembresia(?,?)}";
+            String sql = "{call sp_Listasuscripciones_MembresiaXCodMembresia(?,?)}";
             st = cn.prepareCall(sql);
             
             st.setString(1, CodEmp);
@@ -493,7 +604,7 @@ public class MembresiaDAO {
         try
         {
             cnn = ConexionBD.obtenerConexion();
-            String sql = "{sp_InsertMembresia(?,?,?,?,?,?,?,?,?,?)}";
+            String sql = "{call sp_InsertMembresia(?,?,?,?,?,?,?,?,?,?)}";
             cs = cnn.prepareCall(sql);
             
             cs.setString(1, membresia.getCodigoM());
@@ -540,7 +651,7 @@ public class MembresiaDAO {
         try
         {
             cnn = ConexionBD.obtenerConexion();
-            String sql = "{sp_UpdateMembresia(?,?,?,?,?,?,?,?,?,?)}";
+            String sql = "{call sp_UpdateMembresia(?,?,?,?,?,?,?,?,?,?)}";
             cs = cnn.prepareCall(sql);
             
             cs.setString(1, membresia.getCodigoM());
@@ -587,7 +698,7 @@ public class MembresiaDAO {
         try
         {
             cnn = ConexionBD.obtenerConexion();
-            String sql = "{sp_DeleteMembresia(?)}";
+            String sql = "{call sp_DeleteMembresia(?)}";
             cs = cnn.prepareCall(sql);
             
             cs.setString(1, membresia.getCodigoM());
@@ -625,7 +736,7 @@ public class MembresiaDAO {
         try
         {
             cnn = ConexionBD.obtenerConexion();
-            String sql = "{sp_InsertDiasMembresia(?,?,?)}";
+            String sql = "{call sp_InsertDiasMembresia(?,?,?)}";
             cs = cnn.prepareCall(sql);
             
             cs.setString(1,membresia.getCodigoM());
@@ -665,7 +776,7 @@ public class MembresiaDAO {
         try
         {
             cnn = ConexionBD.obtenerConexion();
-            String sql = "{sp_DeleteDiasMembresia(?)}";
+            String sql = "{call sp_DeleteDiasMembresia(?)}";
             cs = cnn.prepareCall(sql);
             
             cs.setString(1,membresia.getCodigoM());

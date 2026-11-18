@@ -5,8 +5,8 @@
     xmlns:h="jakarta.faces.html"
     template="/WEB-INF/templates/principal.xhtml">
 
-    <ui:param name="menuOpcion" value="asistencia" />
-    <ui:param name="menuSubmenu" value="" />
+    <ui:param name="menuOpcion" value="verAsistencias" />
+    <ui:param name="menuSubmenu" value="asistencia" />
 
     <ui:define name="title">
         Asistencia | Xport Fitness Gym
@@ -344,7 +344,7 @@
                 </div>
 
                 <!-- TABLA -->
-                <div class="asistencia-tabla-contenedor">
+                <div class="asistencia-tabla-contenedor" data-paginar="asistencias">
 
                     <table class="tabla-asistencia">
 

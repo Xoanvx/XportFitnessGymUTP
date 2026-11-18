@@ -1,0 +1,954 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="jakarta.faces.facelets" xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core"
+    xmlns:pt="jakarta.faces.passthrough"
+    xmlns:app="jakarta.faces.composite/components" template="/WEB-INF/templates/principal.xhtml">
+    <ui:param name="menuOpcion" value="nuevoProducto" />
+    <ui:param name="menuSubmenu" value="catalogo" />
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewAction action="#{productoBean.prepararVista}" />
+        </f:metadata>
+    </ui:define>
+    <ui:define name="title">Registro de Productos | Xport Fitness Gym</ui:define>
+    <ui:define name="styles">
+<link rel="stylesheet"
+          href="#{request.contextPath}/css/socios.css" />
+    <style><![CDATA[
+        /* Espaciado general del formulario de productos */
+        #formProductos {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Separación entre columnas del mismo renglón */
+        #formProductos .fila,
+        #busquedaProductos .fila {
+            display: grid;
+            gap: 18px;
+            margin: 0;
+        }
+
+        #formProductos .fila:not(.fila-tres) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        #formProductos .fila-tres {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        /* Separación entre etiqueta y campo */
+        #formProductos .campo,
+        #busquedaProductos .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            min-width: 0;
+            margin: 0;
+        }
+
+        #formProductos .campo label,
+        #busquedaProductos .campo label {
+            display: block;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        /* Altura y comodidad de los controles */
+        #formProductos input,
+        #formProductos select,
+        #busquedaProductos input,
+        #busquedaProductos select {
+            width: 100%;
+            min-height: 39px;
+            padding: 9px 12px;
+            border-radius: 8px;
+        }
+
+        /* Campos calculados o bloqueados */
+        #formProductos input[readonly],
+        #formProductos input:disabled {
+            background: #F0F3F8;
+            color: #475569;
+        }
+
+        #formProductos .ayuda-campo {
+            font-size: 11px;
+            color: #7B8798;
+        }
+
+        /* Evitar que los campos completos se reduzcan */
+        #formProductos .campo-full {
+            width: 100%;
+        }
+
+        /* Adaptación para pantallas pequeñas */
+        @media (max-width: 700px) {
+            #formProductos .fila,
+            #formProductos .fila-tres,
+            #busquedaProductos .fila {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* Título del listado: nombre a la izquierda, cantidad a la derecha */
+        .seccion-titulo {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 28px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #E0E6EF;
+            font-size: 16px;
+            font-weight: 700;
+            color: #10234D;
+        }
+
+        .seccion-titulo .titulo-texto {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contador-items {
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #EAF0FF;
+            color: #2864F0;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Nuevo, Grabar, Actualizar y Salir en una sola fila horizontal */
+        .botones-productos {
+            margin-bottom: 20px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .botones-productos .btn-form,
+        #busquedaProductos .btn-form {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        /* Un commandLink deshabilitado se dibuja como <span> */
+        .botones-productos span.btn-form {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 620px) {
+            .botones-productos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        /* Recuadro de búsqueda */
+        #busquedaProductos {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            border: 1px solid #E0E6EF;
+            border-radius: 10px;
+            background: #F8FAFC;
+        }
+
+        /* Condición de búsqueda: opciones como pastillas */
+        .criterios-busqueda {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 12px;
+            font-size: 12.5px;
+            color: #17233C;
+        }
+
+        .criterios-titulo {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+            color: #10234D;
+        }
+
+        .criterios-opciones,
+        .criterios-opciones tbody,
+        .criterios-opciones tr {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            border: 0;
+            margin: 0;
+        }
+
+        .criterios-opciones td {
+            display: inline-flex;
+            align-items: center;
+            padding: 0;
+            border: 0;
+        }
+
+        .criterios-opciones input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            min-height: 0;
+            margin: 0;
+        }
+
+        .criterios-opciones label {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            border: 1px solid #D8DFEA;
+            border-radius: 999px;
+            background: #FFFFFF;
+            color: #475569;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+
+        .criterios-opciones label:hover {
+            border-color: #2864F0;
+            color: #2864F0;
+        }
+
+        .criterios-opciones input[type="radio"]:checked + label {
+            background: #2864F0;
+            border-color: #2864F0;
+            color: #FFFFFF;
+        }
+
+        .criterios-opciones input[type="radio"]:focus-visible + label {
+            outline: 2px solid #2864F0;
+            outline-offset: 2px;
+        }
+
+        .foto-producto-avatar {
+            border-radius: 12px !important;
+            background-color: #f1f5f9 !important;
+            border: 2px dashed #cbd5e1 !important;
+            color: #94a3b8;
+        }
+
+        .tabla-productos-registro {
+            overflow-x: auto;
+        }
+
+        .tabla-productos-registro .tabla td,
+        .tabla-productos-registro .tabla th {
+            white-space: nowrap;
+        }
+
+        .tabla-productos-registro .num {
+            text-align: right;
+        }
+
+        .nota-productos {
+            margin-bottom: 20px;
+        }
+
+        /* Búsqueda: campo de ancho limitado + botones compactos Buscar (F5) / Listar (F7) */
+        #busquedaProductos .fila {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        #busquedaProductos .fila .campo {
+            flex: 0 1 380px;
+        }
+
+        #busquedaProductos .campo label {
+            font-size: 12px;
+            color: #475569;
+        }
+
+        #busquedaProductos input,
+        #busquedaProductos select {
+            min-height: 36px;
+            padding: 7px 11px;
+            background: #FFFFFF;
+        }
+
+        #busquedaProductos .btn-form {
+            flex: 0 0 auto;
+            min-height: 36px;
+            padding: 0 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 36px;
+        }
+
+        /* Paginación del listado */
+        .productos-paginacion {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 12px;
+            font-size: 12.5px;
+            color: #64748B;
+        }
+
+        .pag-botones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .pag-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 9px;
+            border: 1px solid #D8DFEA;
+            border-radius: 8px;
+            background: #FFFFFF;
+            color: #17233C;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        a.pag-btn:hover {
+            border-color: #2864F0;
+            color: #2864F0;
+        }
+
+        .pag-btn.pag-actual {
+            background: #2864F0;
+            border-color: #2864F0;
+            color: #FFFFFF;
+        }
+
+        span.pag-btn {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        #busquedaProductos .btn-buscar { background: #2864F0; }
+        #busquedaProductos .btn-listar { background: #FFFFFF; color: #2864F0 !important; border: 1px solid #2864F0; }
+        #busquedaProductos .btn-listar:hover { background: #EAF0FF; }
+
+        .mensajes-productos {
+            list-style: none;
+            margin: 0 0 16px;
+            padding: 0;
+            font-size: 13px;
+        }
+
+        .mensajes-productos li {
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+
+        .mensajes-productos .msj-info { background: #ECFDF3; color: #067647; border: 1px solid #A6E3BD; }
+        .mensajes-productos .msj-error { background: #FFF1F1; color: #B42318; border: 1px solid #F3B4B4; }
+    ]]></style>
+    </ui:define>
+    <ui:define name="content">
+<!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+        <section class="panel">
+
+            <div class="titulo-modulo">
+                <i class="fa-solid fa-box-open"></i>
+                <h1>Registro de Productos</h1>
+            </div>
+
+            <h:messages globalOnly="true" layout="list" styleClass="mensajes-productos"
+                        infoClass="msj-info" errorClass="msj-error" />
+
+            <h:form id="frmProducto" prependId="false">
+
+            <!-- FORMULARIO Y FOTO -->
+            <div class="contenido-form">
+
+                <div class="form-socios" id="formProductos">
+
+                    <!-- CODIGO, ESTADO Y TIPO -->
+                    <div class="fila fila-tres">
+                        <div class="campo">
+                            <label for="codigoProducto">
+                                <i class="fa-solid fa-hashtag"></i>
+                                Código
+                            </label>
+                            <h:inputText id="codigoProducto" value="#{productoBean.producto.producto_ID}"
+                                         readonly="true" pt:title="Se genera automáticamente" />
+                        </div>
+
+                        <div class="campo">
+                            <label for="estadoProducto">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Estado
+                            </label>
+                            <h:selectOneMenu id="estadoProducto" value="#{productoBean.producto.estadoProducto}">
+                                <f:selectItem itemLabel="Activo" itemValue="Activo" />
+                                <f:selectItem itemLabel="Inactivo" itemValue="Inactivo" />
+                            </h:selectOneMenu>
+                        </div>
+
+                        <div class="campo">
+                            <label for="tipoProducto">
+                                <i class="fa-solid fa-shapes"></i>
+                                Tipo de producto
+                            </label>
+                            <h:selectOneMenu id="tipoProducto" value="#{productoBean.producto.tipoProd}">
+                                <f:selectItem itemLabel="VENTA" itemValue="V" />
+                                <f:selectItem itemLabel="SERVICIO" itemValue="S" />
+                            </h:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <!-- DESCRIPCION -->
+                    <div class="campo campo-full">
+                        <label for="descripcionProducto">
+                            <i class="fa-solid fa-align-left"></i>
+                            Descripción
+                        </label>
+                        <h:inputText id="descripcionProducto" value="#{productoBean.producto.descripcion}"
+                                     maxlength="100" pt:placeholder="Ej. Proteína Whey 2lb Chocolate" />
+                    </div>
+
+                    <!-- NOMBRE -->
+                    <div class="campo campo-full">
+                        <label for="nombreProducto">
+                            <i class="fa-solid fa-box"></i>
+                            Nombre del Producto
+                        </label>
+                        <h:inputText id="nombreProducto" value="#{productoBean.producto.nombreProducto}"
+                                     maxlength="50" pt:placeholder="Si lo deja vacío se usa la descripción" />
+                    </div>
+
+                    <!-- CATEGORIA Y MARCA -->
+                    <div class="fila">
+                        <div class="campo">
+                            <label for="categoriaProducto">
+                                <i class="fa-solid fa-tags"></i>
+                                Categoría de Producto
+                            </label>
+                            <h:selectOneMenu id="categoriaProducto" value="#{productoBean.producto.categoria_ID}">
+                                <f:selectItem itemLabel="-- Seleccione --" itemValue="0" />
+                                <f:selectItems value="#{productoBean.listaCategorias}" var="c"
+                                               itemValue="#{c.categoria_ID}" itemLabel="#{c.nombre}" />
+                            </h:selectOneMenu>
+                        </div>
+
+                        <div class="campo">
+                            <label for="marcaProducto">
+                                <i class="fa-solid fa-copyright"></i>
+                                Marca de Producto
+                            </label>
+                            <h:selectOneMenu id="marcaProducto" value="#{productoBean.producto.marcaProducto_ID}">
+                                <f:selectItem itemLabel="-- Seleccione --" itemValue="0" />
+                                <f:selectItems value="#{productoBean.listaMarcas}" var="m"
+                                               itemValue="#{m.marca_ID}" itemLabel="#{m.nombre}" />
+                            </h:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <!-- UNIDAD, CODIGO DE BARRA Y PESO -->
+                    <div class="fila fila-tres">
+                        <div class="campo">
+                            <label for="unidadMedida">
+                                <i class="fa-solid fa-ruler"></i>
+                                U. Medida
+                            </label>
+                            <h:selectOneMenu id="unidadMedida" value="#{productoBean.producto.unidadMedida}">
+                                <f:selectItem itemLabel="UND" itemValue="UND" />
+                                <f:selectItem itemLabel="PQT" itemValue="PQT" />
+                            </h:selectOneMenu>
+                        </div>
+
+                        <div class="campo">
+                            <label for="codigoBarra">
+                                <i class="fa-solid fa-barcode"></i>
+                                Código de Barra
+                            </label>
+                            <h:inputText id="codigoBarra" value="#{productoBean.producto.codigoBarra}"
+                                         maxlength="50" pt:placeholder="Escanee o escriba (Insert)" />
+                        </div>
+
+                        <div class="campo">
+                            <label for="pesoProducto">
+                                <i class="fa-solid fa-weight-hanging"></i>
+                                Peso
+                            </label>
+                            <h:inputText id="pesoProducto" value="#{productoBean.producto.peso}"
+                                         pt:type="number" pt:min="0" pt:step="0.01" />
+                        </div>
+                    </div>
+
+                    <!-- STOCK Y PRECIOS -->
+                    <div class="fila fila-tres">
+                        <div class="campo">
+                            <label for="stockActual">
+                                <i class="fa-solid fa-cubes"></i>
+                                Stock Final
+                            </label>
+                            <h:inputText id="stockActual" value="#{productoBean.producto.stockFinal}"
+                                         disabled="#{not productoBean.stockEditable}"
+                                         pt:type="number" pt:min="0" pt:step="1" />
+                            <h:outputText rendered="#{not productoBean.stockEditable}" styleClass="ayuda-campo"
+                                          value="Tiene ventas: el stock no se modifica aquí." />
+                        </div>
+
+                        <div class="campo">
+                            <label for="precioCompra">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                Precio Costo
+                            </label>
+                            <h:inputText id="precioCompra" value="#{productoBean.producto.precioCosto}"
+                                         pt:type="number" pt:min="0" pt:step="0.01">
+                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2" groupingUsed="false" locale="en_US" />
+                            </h:inputText>
+                        </div>
+
+                        <div class="campo">
+                            <label for="precioVenta">
+                                <i class="fa-solid fa-money-bill-wave"></i>
+                                Precio Venta
+                            </label>
+                            <h:inputText id="precioVenta" value="#{productoBean.producto.precioVenta}"
+                                         pt:type="number" pt:min="0" pt:step="0.01">
+                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2" groupingUsed="false" locale="en_US" />
+                            </h:inputText>
+                        </div>
+                    </div>
+
+                    <!-- PRECIO LIMITE, UTILIDAD Y MARGEN -->
+                    <div class="fila fila-tres">
+                        <div class="campo">
+                            <label for="precioLimite">
+                                <i class="fa-solid fa-arrow-down-short-wide"></i>
+                                Precio Límite
+                            </label>
+                            <h:inputText id="precioLimite" value="#{productoBean.producto.precioLimite}"
+                                         pt:type="number" pt:min="0" pt:step="0.01">
+                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2" groupingUsed="false" locale="en_US" />
+                            </h:inputText>
+                        </div>
+
+                        <div class="campo">
+                            <label for="utilidadProducto">
+                                <i class="fa-solid fa-coins"></i>
+                                Utilidad (S/)
+                            </label>
+                            <input type="text" id="utilidadProducto" readonly="readonly"
+                                   value="#{productoBean.producto.utilidad}" />
+                        </div>
+
+                        <div class="campo">
+                            <label for="margenProducto">
+                                <i class="fa-solid fa-percent"></i>
+                                Margen
+                            </label>
+                            <input type="text" id="margenProducto" readonly="readonly"
+                                   value="#{productoBean.producto.margenUtil}" />
+                        </div>
+                    </div>
+
+                    <h:inputHidden id="imagenNombre" value="#{productoBean.producto.imagen}" />
+                </div>
+
+                <!-- FOTO DEL PRODUCTO -->
+                <aside class="foto-card">
+                    <div class="foto-titulo">FOTO DEL PRODUCTO</div>
+
+                    <div class="foto-avatar foto-producto-avatar"
+                         id="fotoProductoAvatar">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+
+                    <input type="file"
+                           id="imagenProducto"
+                           name="imagenProducto"
+                           accept="image/*"
+                           hidden="hidden" />
+
+                    <button type="button"
+                            class="btn-subir"
+                            id="btnSubirImagen">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        Subir Imagen
+                    </button>
+
+                    <p class="foto-ayuda" id="nombreImagen">
+                        #{empty productoBean.producto.imagen ? 'Selecciona una imagen del producto.' : productoBean.producto.imagen}
+                    </p>
+                </aside>
+
+            </div>
+
+            <!-- BOTONES -->
+            <!-- Los cuatro botones en una sola fila: Nuevo, Grabar, Actualizar, Salir -->
+            <div class="botones-form botones-productos">
+                <h:commandLink id="btnNuevoProducto" action="#{productoBean.nuevo}" styleClass="btn-form btn-nuevo">
+                    <i class="fa-solid fa-plus"></i>&#160;Nuevo (F2)
+                </h:commandLink>
+
+                <h:commandLink id="btnGrabarProducto" action="#{productoBean.grabar}"
+                               styleClass="btn-form btn-grabar" disabled="#{productoBean.edicion}">
+                    <i class="fa-solid fa-floppy-disk"></i>&#160;Grabar (F3)
+                </h:commandLink>
+
+                <h:commandLink id="btnActualizarProducto" action="#{productoBean.actualizar}"
+                               styleClass="btn-form btn-actualizar" disabled="#{not productoBean.edicion}">
+                    <i class="fa-solid fa-rotate"></i>&#160;Actualizar (F4)
+                </h:commandLink>
+
+                <h:commandLink id="btnSalirProducto" action="#{productoBean.salir}" immediate="true"
+                               styleClass="btn-form btn-salir">
+                    <i class="fa-solid fa-right-from-bracket"></i>&#160;Salir (Esc)
+                </h:commandLink>
+            </div>
+
+            </h:form>
+
+            <!-- LISTADO -->
+            <div class="seccion-titulo">
+                <span class="titulo-texto">
+                    <i class="fa-solid fa-list"></i>
+                    Lista de Productos
+                </span>
+                <span class="contador-items">#{productoBean.totalItems} #{productoBean.totalItems eq 1 ? 'producto' : 'productos'}</span>
+            </div>
+
+            <h:form id="frmListaProductos" prependId="false">
+                <div id="busquedaProductos">
+                    <!-- Condición de filtro -->
+                    <div class="criterios-busqueda" role="radiogroup" aria-label="Condición de búsqueda">
+                        <span class="criterios-titulo"><i class="fa-solid fa-filter"></i> Buscar por:</span>
+                        <h:selectOneRadio id="criterioBusqueda" value="#{productoBean.criterioBusqueda}"
+                                          layout="lineDirection" styleClass="criterios-opciones">
+                            <f:selectItem itemLabel="Nombre" itemValue="NOMBRE" />
+                            <f:selectItem itemLabel="Código de Barra" itemValue="BARRA" />
+                            <f:selectItem itemLabel="Categoría" itemValue="CATEGORIA" />
+                            <f:selectItem itemLabel="Marca" itemValue="MARCA" />
+                        </h:selectOneRadio>
+                    </div>
+
+                    <div class="fila">
+                        <!-- Nombre o código de barra -->
+                        <div class="campo" id="busquedaTexto"
+                             style="#{productoBean.criterioBusqueda eq 'CATEGORIA' or productoBean.criterioBusqueda eq 'MARCA' ? 'display:none' : ''}">
+                            <label for="textoBusqueda" id="etiquetaBusqueda">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                #{productoBean.criterioBusqueda eq 'BARRA' ? 'Código de barra' : 'Nombre del producto'}
+                            </label>
+                            <h:inputText id="textoBusqueda" value="#{productoBean.textoBusqueda}"
+                                         pt:placeholder="#{productoBean.criterioBusqueda eq 'BARRA' ? 'Escanee o escriba el código de barra' : 'Nombre o descripción del producto'}" />
+                        </div>
+
+                        <!-- Categoría -->
+                        <div class="campo" id="busquedaCategoria"
+                             style="#{productoBean.criterioBusqueda eq 'CATEGORIA' ? '' : 'display:none'}">
+                            <label for="categoriaBusqueda"><i class="fa-solid fa-tags"></i> Categoría</label>
+                            <h:selectOneMenu id="categoriaBusqueda" value="#{productoBean.categoriaBusqueda}">
+                                <f:selectItem itemLabel="-- Seleccione --" itemValue="0" />
+                                <f:selectItems value="#{productoBean.listaCategorias}" var="c"
+                                               itemValue="#{c.categoria_ID}" itemLabel="#{c.nombre}" />
+                            </h:selectOneMenu>
+                        </div>
+
+                        <!-- Marca -->
+                        <div class="campo" id="busquedaMarca"
+                             style="#{productoBean.criterioBusqueda eq 'MARCA' ? '' : 'display:none'}">
+                            <label for="marcaBusqueda"><i class="fa-solid fa-copyright"></i> Marca</label>
+                            <h:selectOneMenu id="marcaBusqueda" value="#{productoBean.marcaBusqueda}">
+                                <f:selectItem itemLabel="-- Seleccione --" itemValue="0" />
+                                <f:selectItems value="#{productoBean.listaMarcas}" var="m"
+                                               itemValue="#{m.marca_ID}" itemLabel="#{m.nombre}" />
+                            </h:selectOneMenu>
+                        </div>
+
+                        <h:commandLink id="btnBuscarProducto" action="#{productoBean.buscar}" styleClass="btn-form btn-buscar">
+                            <i class="fa-solid fa-magnifying-glass"></i>&#160;Buscar (F5)
+                        </h:commandLink>
+                        <h:commandLink id="btnListarProductos" action="#{productoBean.listar}" styleClass="btn-form btn-listar">
+                            <i class="fa-solid fa-list"></i>&#160;Listar (F7)
+                        </h:commandLink>
+                    </div>
+                </div>
+
+                <div class="tabla-contenedor tabla-productos-registro">
+                    <table class="tabla">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                                <th>Categoría</th>
+                                <th>Marca</th>
+                                <th>Nombre Producto</th>
+                                <th>U. Medida</th>
+                                <th>Stock</th>
+                                <th>P. Costo</th>
+                                <th>P. Venta</th>
+                                <th>P. Límite</th>
+                                <th>Margen %</th>
+                                <th>Peso</th>
+                                <th>Código Barra</th>
+                                <th>Tipo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <ui:repeat value="#{productoBean.listaPagina}" var="p">
+                                <tr>
+                                    <td>#{p.producto_ID}</td>
+                                    <td>#{p.descripcion}</td>
+                                    <td><span class="punto #{p.estadoProducto eq 'Activo' ? 'verde' : 'rojo'}"></span> #{p.estadoProducto}</td>
+                                    <td>#{p.categoria}</td>
+                                    <td>#{p.marca}</td>
+                                    <td>#{p.nombreProducto}</td>
+                                    <td>#{p.unidadMedida}</td>
+                                    <td class="num"><h:outputText value="#{p.stockFinal}"><f:convertNumber maxFractionDigits="2" /></h:outputText></td>
+                                    <td class="num"><h:outputText value="#{p.precioCosto}"><f:convertNumber minFractionDigits="2" maxFractionDigits="2" /></h:outputText></td>
+                                    <td class="num"><h:outputText value="#{p.precioVenta}"><f:convertNumber minFractionDigits="2" maxFractionDigits="2" /></h:outputText></td>
+                                    <td class="num"><h:outputText value="#{p.precioLimite}"><f:convertNumber minFractionDigits="2" maxFractionDigits="2" /></h:outputText></td>
+                                    <td class="num"><h:outputText value="#{p.margenUtil}"><f:convertNumber minFractionDigits="2" maxFractionDigits="2" /></h:outputText></td>
+                                    <td class="num"><h:outputText value="#{p.peso}"><f:convertNumber maxFractionDigits="2" /></h:outputText></td>
+                                    <td>#{p.codigoBarra}</td>
+                                    <td>#{p.tipoProdTexto}</td>
+                                    <td>
+                                        <h:commandLink action="#{productoBean.editar(p)}" styleClass="btn-accion btn-oscuro"
+                                                       title="Editar">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </h:commandLink>
+                                        <h:commandLink action="#{productoBean.eliminar(p)}" styleClass="btn-accion btn-rojo"
+                                                       title="Eliminar"
+                                                       onclick="return confirm('¿Desea eliminar el artículo #{p.producto_ID}? Quedará Inactivo.');">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </h:commandLink>
+                                    </td>
+                                </tr>
+                            </ui:repeat>
+                            <ui:fragment rendered="#{empty productoBean.lista}">
+                                <tr><td colspan="16">No hay productos para mostrar.</td></tr>
+                            </ui:fragment>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginación (más de 10 items): cambiar de página no vuelve a consultar la BD -->
+                <h:panelGroup layout="block" styleClass="productos-paginacion" rendered="#{productoBean.conPaginacion}">
+                    <span class="pag-resumen">
+                        Mostrando #{productoBean.desde}–#{productoBean.hasta} de #{productoBean.totalItems}
+                    </span>
+                    <nav class="pag-botones" aria-label="Paginación de productos">
+                        <h:commandLink action="#{productoBean.irAPagina(1)}" title="Primera página"
+                                       styleClass="pag-btn" disabled="#{productoBean.pagina eq 1}">
+                            <i class="fa-solid fa-angles-left"></i>
+                        </h:commandLink>
+                        <h:commandLink action="#{productoBean.irAPagina(productoBean.pagina - 1)}" title="Anterior"
+                                       styleClass="pag-btn" disabled="#{productoBean.pagina eq 1}">
+                            <i class="fa-solid fa-angle-left"></i>
+                        </h:commandLink>
+                        <ui:repeat value="#{productoBean.paginasVisibles}" var="num">
+                            <h:commandLink action="#{productoBean.irAPagina(num)}" value="#{num}"
+                                           styleClass="pag-btn #{num eq productoBean.pagina ? 'pag-actual' : ''}" />
+                        </ui:repeat>
+                        <h:commandLink action="#{productoBean.irAPagina(productoBean.pagina + 1)}" title="Siguiente"
+                                       styleClass="pag-btn" disabled="#{productoBean.pagina eq productoBean.totalPaginas}">
+                            <i class="fa-solid fa-angle-right"></i>
+                        </h:commandLink>
+                        <h:commandLink action="#{productoBean.irAPagina(productoBean.totalPaginas)}" title="Última página"
+                                       styleClass="pag-btn" disabled="#{productoBean.pagina eq productoBean.totalPaginas}">
+                            <i class="fa-solid fa-angles-right"></i>
+                        </h:commandLink>
+                    </nav>
+                </h:panelGroup>
+            </h:form>
+
+            <p class="nota-demo nota-productos">
+                <i class="fa-solid fa-circle-info"></i>
+                #{productoBean.descripcionFiltro} · Total items: <strong>#{productoBean.totalItems}</strong>
+            </p>
+
+        </section>
+    </main>
+    </ui:define>
+    <ui:define name="scripts">
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function () {
+    "use strict";
+
+    const inputImagen = document.getElementById("imagenProducto");
+    const botonImagen = document.getElementById("btnSubirImagen");
+    const avatar = document.getElementById("fotoProductoAvatar");
+    const nombreImagen = document.getElementById("nombreImagen");
+    const imagenOculta = document.getElementById("imagenNombre");
+
+    const descripcion = document.getElementById("descripcionProducto");
+    const nombre = document.getElementById("nombreProducto");
+    const costo = document.getElementById("precioCompra");
+    const venta = document.getElementById("precioVenta");
+    const utilidad = document.getElementById("utilidadProducto");
+    const margen = document.getElementById("margenProducto");
+    const codigoBarra = document.getElementById("codigoBarra");
+
+    function numero(campo) {
+        const v = parseFloat(campo ? campo.value : "");
+        return isNaN(v) ? 0 : v;
+    }
+
+    // Utilidad = PrecioVenta - PrecioCosto; Margen % = (PrecioVenta / PrecioCosto - 1) * 100 (CalculoUtilidad de frm_Productos)
+    function calcularUtilidad() {
+        if (!costo || !venta) return;
+        const c = numero(costo);
+        const v = numero(venta);
+        utilidad.value = (v - c).toFixed(2);
+        margen.value = c > 0 ? ((v / c - 1) * 100).toFixed(2) : "0.00";
+    }
+
+    if (costo) costo.addEventListener("input", calcularUtilidad);
+    if (venta) venta.addEventListener("input", calcularUtilidad);
+    calcularUtilidad();
+
+    // Al salir de la descripción se copia al nombre si está vacío (Enter en txtdesc de frm_Productos)
+    if (descripcion) {
+        if (nombre) {
+            descripcion.addEventListener("change", function () {
+                if (nombre.value.trim() === "") nombre.value = descripcion.value.trim().substring(0, 50);
+            });
+        }
+    }
+
+    // Imagen: vista previa y se guarda el nombre del archivo (como txtimagen de frm_Productos)
+    if (botonImagen) {
+        botonImagen.addEventListener("click", function () {
+            inputImagen.click();
+        });
+    }
+
+    if (inputImagen) {
+        inputImagen.addEventListener("change", function () {
+            const archivo = inputImagen.files[0];
+            if (!archivo) return;
+
+            if (!archivo.type.startsWith("image/")) {
+                alert("Selecciona un archivo de imagen válido.");
+                inputImagen.value = "";
+                return;
+            }
+
+            if (imagenOculta) imagenOculta.value = archivo.name.substring(0, 150);
+            if (nombreImagen) nombreImagen.textContent = archivo.name;
+
+            const lector = new FileReader();
+            lector.onload = function (evento) {
+                avatar.replaceChildren();
+                avatar.style.backgroundImage = "url('" + evento.target.result + "')";
+                avatar.style.backgroundSize = "contain";
+                avatar.style.backgroundPosition = "center";
+                avatar.style.backgroundRepeat = "no-repeat";
+            };
+            lector.onerror = function () {
+                alert("No se pudo cargar la imagen seleccionada.");
+                inputImagen.value = "";
+            };
+            lector.readAsDataURL(archivo);
+        });
+    }
+
+    // Condición de búsqueda: muestra el campo que corresponde (texto, categoría o marca)
+    const cajaTexto = document.getElementById("busquedaTexto");
+    const cajaCategoria = document.getElementById("busquedaCategoria");
+    const cajaMarca = document.getElementById("busquedaMarca");
+    const etiquetaBusqueda = document.getElementById("etiquetaBusqueda");
+    const criterios = document.querySelectorAll('input[name="criterioBusqueda"]');
+
+    function aplicarCriterio(valor) {
+        const esTexto = valor === "NOMBRE" || valor === "BARRA";
+        cajaTexto.style.display = esTexto ? "" : "none";
+        cajaCategoria.style.display = valor === "CATEGORIA" ? "" : "none";
+        cajaMarca.style.display = valor === "MARCA" ? "" : "none";
+
+        if (esTexto) {
+            const barra = valor === "BARRA";
+            const icono = document.createElement("i");
+            icono.className = "fa-solid fa-magnifying-glass";
+            etiquetaBusqueda.replaceChildren(icono,
+                document.createTextNode(" " + (barra ? "Código de barra" : "Nombre del producto")));
+            textoBusqueda.placeholder = barra ? "Escanee o escriba el código de barra"
+                                              : "Nombre o descripción del producto";
+            textoBusqueda.focus();
+        }
+    }
+
+    criterios.forEach(function (radio) {
+        radio.addEventListener("change", function () {
+            if (radio.checked) aplicarCriterio(radio.value);
+        });
+    });
+
+    // Enter en la búsqueda ejecuta Buscar (y no Grabar)
+    const textoBusqueda = document.getElementById("textoBusqueda");
+    if (textoBusqueda) {
+        textoBusqueda.addEventListener("keydown", function (evento) {
+            if (evento.key === "Enter") {
+                evento.preventDefault();
+                document.getElementById("btnBuscarProducto").click();
+            }
+        });
+    }
+
+    // Los botones son enlaces; uno deshabilitado se dibuja como SPAN y no hace nada.
+    function pulsar(id) {
+        const boton = document.getElementById(id);
+        if (!boton) return false;
+        if (boton.tagName !== "A") return false;
+        boton.click();
+        return true;
+    }
+
+    // Atajos de teclado de frm_Productos
+    document.addEventListener("keydown", function (evento) {
+        const teclas = {
+            F2: "btnNuevoProducto",
+            F3: "btnGrabarProducto",
+            F4: "btnActualizarProducto",
+            F5: "btnBuscarProducto",
+            F7: "btnListarProductos",
+            Escape: "btnSalirProducto"
+        };
+
+        if (evento.key === "Insert") {
+            if (codigoBarra) {
+                evento.preventDefault();
+                codigoBarra.value = "";
+                codigoBarra.focus();
+            }
+            return;
+        }
+
+        const id = teclas[evento.key];
+        if (id) {
+            evento.preventDefault();
+            pulsar(id);
+        }
+    });
+
+    if (descripcion) {
+        if (!document.querySelector(".mensajes-productos .msj-error")) descripcion.focus();
+    }
+});
+</script>
+    </ui:define>
+</ui:composition>

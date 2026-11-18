@@ -19,8 +19,14 @@
             <li class="#{cc.attrs.opcion eq 'inicio' ? 'active' : ''}">
                 <h:link outcome="/dashboard.xhtml"><i class="fa-solid fa-house-user"></i><span>Inicio</span></h:link>
             </li>
-            <li class="#{cc.attrs.opcion eq 'asistencia' ? 'active' : ''}">
-                <h:link outcome="/asistencia.xhtml"><i class="fa-solid fa-user-check"></i><span>Asistencia</span></h:link>
+            <li class="menu-desplegable #{cc.attrs.submenu eq 'asistencia' ? 'abierto' : ''}" id="menuAsistencia">
+                <a href="#" class="menu-enlace" onclick="toggleSubmenu(event, 'submenuAsistencia')" aria-expanded="#{cc.attrs.submenu eq 'asistencia'}">
+                    <i class="fa-solid fa-user-check"></i><span>Asistencia</span><i class="fa-solid fa-chevron-down flecha-submenu"></i>
+                </a>
+                <ul class="submenu" id="submenuAsistencia">
+                    <li class="#{cc.attrs.opcion eq 'registrarAsistencia' ? 'submenu-activo' : ''}"><h:link outcome="/RegistrarAsistencia.xhtml"><i class="fa-solid fa-fingerprint"></i><span>Registrar Asistencia</span></h:link></li>
+                    <li class="#{cc.attrs.opcion eq 'verAsistencias' ? 'submenu-activo' : ''}"><h:link outcome="/asistencia.xhtml"><i class="fa-solid fa-list-check"></i><span>Ver Asistencias</span></h:link></li>
+                </ul>
             </li>
             <li class="menu-desplegable #{cc.attrs.submenu eq 'membresias' ? 'abierto' : ''}"
                 id="menuMembresias">
@@ -37,6 +43,20 @@
                 </a>
 
                 <ul class="submenu" id="submenuMembresias">
+
+                    <li class="#{cc.attrs.opcion eq 'suscripcionMembresia' ? 'submenu-activo' : ''}">
+                        <h:link outcome="/membresias.xhtml">
+                            <i class="fa-solid fa-file-signature"></i>
+                            <span>Suscripción de Membresía</span>
+                        </h:link>
+                    </li>
+
+                    <li class="#{cc.attrs.opcion eq 'listarSuscripciones' ? 'submenu-activo' : ''}">
+                        <h:link outcome="/ListaSuscripcionesMembresia.xhtml">
+                            <i class="fa-solid fa-address-book"></i>
+                            <span>Ver Suscripciones de Membresía</span>
+                        </h:link>
+                    </li>
 
                     <li class="#{cc.attrs.opcion eq 'listarMembresias' ? 'submenu-activo' : ''}">
                         <h:link outcome="/ListaPlanesMembresia.xhtml">
@@ -72,6 +92,9 @@
             <li class="#{cc.attrs.opcion eq 'almacen' ? 'active' : ''}"><h:link outcome="/Almacen.xhtml"><i class="fa-solid fa-warehouse"></i><span>Almacén</span></h:link></li>
         </ul>
         <ul class="sidebar-menu2">
+            <li class="#{cc.attrs.opcion eq 'cambiarClave' ? 'active' : ''}">
+                <h:link outcome="/CambiarClave.xhtml"><i class="fa-solid fa-key"></i><span>Cambiar contraseña</span></h:link>
+            </li>
             <li><h:link outcome="/configurar.xhtml"><i class="fa-solid fa-gear"></i><span>Configurar</span></h:link></li>
             <li>
                 <h:form id="formCerrarSesion" styleClass="menu-logout-form">

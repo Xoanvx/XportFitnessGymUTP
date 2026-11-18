@@ -1,0 +1,33 @@
+/* Barra superior con el usuario que inició sesión (WEB-INF/templates/principal.xhtml) */
+
+/* Columna derecha: barra + contenido de cada página */
+.app-contenido{flex:1;min-width:0;display:flex;flex-direction:column}
+
+/* Las páginas que pedían 100vh ahora llenan solo el espacio bajo la barra */
+.app-contenido > main{flex:1 1 auto;min-height:0}
+.app-contenido > main.pv-main{height:calc(100vh - 58px)}
+
+.barra-usuario{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    min-height:58px;padding:8px 24px;box-sizing:border-box;background:#fff;border-bottom:1px solid #e2e8f0;
+    box-shadow:0 2px 8px rgba(16,38,83,.06);font-family:Arial,Helvetica,sans-serif}
+
+.barra-usuario-izq{display:flex;align-items:center;gap:10px;min-width:0;color:#102653}
+.barra-usuario-izq > i{color:#2864F0;font-size:16px}
+.barra-usuario-negocio{font-size:14px;font-weight:700;white-space:nowrap}
+.barra-usuario-fecha{font-size:12px;color:#64748b;white-space:nowrap;padding-left:10px;border-left:1px solid #e2e8f0}
+.barra-usuario-fecha:empty{display:none}
+
+.barra-usuario-der{display:flex;align-items:center;gap:10px;min-width:0;padding:5px 12px 5px 6px;border:1px solid #e2e8f0;border-radius:40px;background:#f8fafc}
+.barra-usuario-avatar{flex:0 0 36px;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#102653,#2864F0);color:#fff;font-size:15px}
+.barra-usuario-datos{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.barra-usuario-datos strong{font-size:13px;color:#102653;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px;text-transform:uppercase}
+.barra-usuario-datos span{font-size:11.5px;color:#64748b;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.barra-usuario-rol{font-style:normal;font-size:10.5px;font-weight:700;padding:1px 8px;border-radius:20px;background:#e0ebff;color:#1e40af;text-transform:uppercase}
+
+@media(max-width:760px){
+    .barra-usuario{position:static;padding:8px 12px}
+    .barra-usuario-negocio,.barra-usuario-fecha{display:none}
+    .barra-usuario-datos strong{max-width:160px}
+    .app-contenido > main.pv-main{height:auto}
+}

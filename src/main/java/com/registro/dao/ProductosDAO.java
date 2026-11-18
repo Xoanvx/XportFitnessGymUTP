@@ -135,9 +135,10 @@ public class ProductosDAO {
           {
               MarcasDTO marca = new MarcasDTO();
 
-              marca.setMarca_ID(rs.getInt("Marca_ID"));
+              // sp_listaMarcaAct devuelve MarcaProducto_ID, Nombre, EstadoMarca
+              marca.setMarca_ID(rs.getInt("MarcaProducto_ID"));
               marca.setNombre(rs.getString("Nombre"));
-              marca.setNombre(rs.getString("EstadoMarca"));
+              marca.setEstadoMarca(rs.getString("EstadoMarca"));
               
               listaMarca.add(marca);
           }
@@ -161,131 +162,6 @@ public class ProductosDAO {
       }
       
       return listaMarca;
-  }
-  
-  public List<ProductosDTO> ListaProductosGralActivos()
-  {
-      List<ProductosDTO> listaProductos = new ArrayList<>();
-      Connection cn = null;
-      CallableStatement cs = null;
-      ResultSet rs = null;
-      
-      try
-      {
-          cn = ConexionBD.obtenerConexion();
-          String sql = "{call sp_Lista_ProductosGral_Activos}";
-          
-          cs = cn.prepareCall(sql);
-          rs = cs.executeQuery();
-          
-          while(rs.next())
-          {
-              ProductosDTO productos = new ProductosDTO();
-              productos.setProducto_ID(rs.getString("Producto_ID"));
-              productos.setNombreProducto(rs.getString("NombreProducto"));
-              productos.setEstadoProducto(rs.getString("EstadoProducto"));
-              productos.setCategoria_ID(rs.getInt("Categoria_ID"));
-              productos.setMarcaProducto_ID(rs.getInt("MarcaProducto_ID"));
-              productos.setDescripcionTipo(rs.getString("Descripcion"));
-              productos.setUnidadMedida(rs.getString("UnidadMedida"));
-              productos.setStockFinal(rs.getDouble("StockFinal"));
-              productos.setPrecioCosto(rs.getDouble("PrecioCosto"));
-              productos.setPrecioVenta(rs.getDouble("PrecioVenta"));
-              productos.setPrecioLimite(rs.getDouble("PrecioLimite"));
-              productos.setMargenUtil(rs.getDouble("MargenUtil"));
-              productos.setPeso(rs.getDouble("Peso"));
-              productos.setImagen(rs.getString("Imagen"));
-              productos.setCodigoBarra(rs.getString("CodigoBarra"));
-              productos.setCodEmp(rs.getString("CodEmp"));
-              productos.setTipoProd(rs.getString("TipoProd"));
-              productos.setTipoBien_ID(rs.getString("TipoBien_ID"));
-
-              listaProductos.add(productos);
-          }
-      }
-      catch(SQLException ex)
-      {
-          ex.printStackTrace();
-      }
-      finally
-      {
-          try
-          {
-              if(cn != null)cn.close();
-              if(cs != null)cs.close();
-              if(rs != null)rs.close();
-          }
-          catch(SQLException ex)
-          {
-              ex.printStackTrace();
-          }
-      }
-      
-      return listaProductos;
-  }
-  
-  public List<ProductosDTO> ListaProductosXNombre(String CodEmp,String NombreProducto)
-  {
-      List<ProductosDTO> listaProductosXNombre = new ArrayList<>();
-      Connection cn = null;
-      CallableStatement cs = null;
-      ResultSet rs = null;
-      
-      try
-      {
-          cn = ConexionBD.obtenerConexion();
-          String sql = "{call sp_Lista_ProductosGral_ActivosXNom(?,?)}";
-          
-          cs = cn.prepareCall(sql);
-          cs.setString(1,CodEmp);
-          cs.setString(2, NombreProducto);
-          
-          rs = cs.executeQuery();
-          
-          while(rs.next())
-          {
-              ProductosDTO productos = new ProductosDTO();
-              productos.setProducto_ID(rs.getString("Producto_ID"));
-              productos.setNombreProducto(rs.getString("NombreProducto"));
-              productos.setEstadoProducto(rs.getString("EstadoProducto"));
-              productos.setCategoria_ID(rs.getInt("Categoria_ID"));
-              productos.setMarcaProducto_ID(rs.getInt("MarcaProducto_ID"));
-              productos.setDescripcionTipo(rs.getString("Descripcion"));
-              productos.setUnidadMedida(rs.getString("UnidadMedida"));
-              productos.setStockFinal(rs.getDouble("StockFinal"));
-              productos.setPrecioCosto(rs.getDouble("PrecioCosto"));
-              productos.setPrecioVenta(rs.getDouble("PrecioVenta"));
-              productos.setPrecioLimite(rs.getDouble("PrecioLimite"));
-              productos.setMargenUtil(rs.getDouble("MargenUtil"));
-              productos.setPeso(rs.getDouble("Peso"));
-              productos.setImagen(rs.getString("Imagen"));
-              productos.setCodigoBarra(rs.getString("CodigoBarra"));
-              productos.setCodEmp(rs.getString("CodEmp"));
-              productos.setTipoProd(rs.getString("TipoProd"));
-              productos.setTipoBien_ID(rs.getString("TipoBien_ID"));
-
-              listaProductosXNombre.add(productos);
-          }
-      }
-      catch(SQLException ex)
-      {
-          ex.printStackTrace();
-      }
-      finally
-      {
-          try
-          {
-              if(cn != null)cn.close();
-              if(cs != null)cs.close();
-              if(rs != null)rs.close();
-          }
-          catch(SQLException ex)
-          {
-              ex.printStackTrace();
-          }
-      }
-      
-      return listaProductosXNombre;
   }
   
   /**
@@ -536,182 +412,250 @@ public class ProductosDAO {
 
   /**
      * MANTENIMIENTO DE PRODUCTOS DE COMERCIALIZACION
-     * 
-     * */ 
+     * */
+
+    /** sp_Lista_ProductosGral_Activos @CodEmp: productos activos de la empresa. */
+    public List<ProductosDTO> ListaProductosActivos(String codEmp)
+    {
+        List<ProductosDTO> lista = new ArrayList<>();
+        String sql = "{call sp_Lista_ProductosGral_Activos(?)}";
+        try (Connection cn = ConexionBD.obtenerConexion();
+             CallableStatement cs = cn.prepareCall(sql))
+        {
+            cs.setString("CodEmp", codEmp);
+            leerListado(cs, lista);
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        return lista;
+    }
+
+    /** sp_buscaProdxNomTotAct @CodEmp, @descprod: búsqueda por nombre/descripción (frm_BusquedaProd). */
+    public List<ProductosDTO> BuscaProductosXNombre(String codEmp, String texto)
+    {
+        List<ProductosDTO> lista = new ArrayList<>();
+        String sql = "{call sp_buscaProdxNomTotAct(?,?)}";
+        try (Connection cn = ConexionBD.obtenerConexion();
+             CallableStatement cs = cn.prepareCall(sql))
+        {
+            cs.setString("CodEmp", codEmp);
+            cs.setString("descprod", texto);
+            leerListado(cs, lista);
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        return lista;
+    }
+
+    /** sp_buscaProdxMarcaActivo @CodEmp, @MarcaProducto_ID: productos activos de una marca. */
+    public List<ProductosDTO> BuscaProductosXMarca(String codEmp, int marcaId)
+    {
+        List<ProductosDTO> lista = new ArrayList<>();
+        String sql = "{call sp_buscaProdxMarcaActivo(?,?)}";
+        try (Connection cn = ConexionBD.obtenerConexion();
+             CallableStatement cs = cn.prepareCall(sql))
+        {
+            cs.setString("CodEmp", codEmp);
+            cs.setString("MarcaProducto_ID", String.valueOf(marcaId));
+            leerListado(cs, lista);
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        return lista;
+    }
+
+    /** Columnas comunes de los listados: las mismas que ordena frm_Productos.OrdenaGrid(). */
+    private void leerListado(CallableStatement cs, List<ProductosDTO> lista) throws SQLException
+    {
+        try (ResultSet rs = cs.executeQuery())
+        {
+            while (rs.next())
+            {
+                ProductosDTO p = new ProductosDTO();
+                p.setProducto_ID(recortar(rs.getString("Producto_ID")));
+                p.setDescripcion(rs.getString("Descripcion"));
+                p.setEstadoProducto(recortar(rs.getString("EstadoProducto")));
+                p.setCategoria(rs.getString("Categoria"));
+                p.setMarca(rs.getString("Marca"));
+                p.setNombreProducto(rs.getString("NombreProducto"));
+                p.setUnidadMedida(recortar(rs.getString("UnidadMedida")));
+                p.setStockFinal(rs.getDouble("StockFinal"));
+                p.setPrecioCosto(rs.getDouble("PrecioCosto"));
+                p.setPrecioVenta(rs.getDouble("PrecioVenta"));
+                p.setPrecioLimite(rs.getDouble("PrecioLimite"));
+                p.setMargenUtil(rs.getDouble("MargenUtil"));
+                p.setPeso(rs.getDouble("Peso"));
+                p.setImagen(rs.getString("Imagen"));
+                p.setCodigoBarra(rs.getString("CodigoBarra"));
+                p.setTipoProd(recortar(rs.getString("TipoProd")));
+                lista.add(p);
+            }
+        }
+    }
+
+    private static String recortar(String s)
+    {
+        return s == null ? null : s.trim();
+    }
+
+    /** sp_autogenera_codprod: siguiente código de 6 dígitos (columna NuevoID; se lee la primera columna). */
     public ProductosDTO Autogenera_codprod()
     {
-        ProductosDTO autogenera_codprod = null;
-        Connection cnn = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
-        
-        try
+        ProductosDTO autogenera = new ProductosDTO();
+        String sql = "{call sp_autogenera_codprod}";
+        try (Connection cn = ConexionBD.obtenerConexion();
+             CallableStatement cs = cn.prepareCall(sql);
+             ResultSet rs = cs.executeQuery())
         {
-            cnn = ConexionBD.obtenerConexion();
-            String sql = "{call sp_autogenera_codprod}";
-            
-            cs = cnn.prepareCall(sql);
-            rs = cs.executeQuery();
-            
-            autogenera_codprod = new ProductosDTO();
-            
-            if(rs.next())
+            if (rs.next())
             {
-                autogenera_codprod.setProducto_ID(rs.getString("Producto_ID"));
+                autogenera.setProducto_ID(recortar(rs.getString(1)));
             }
         }
-        catch(SQLException ex)
+        catch (SQLException ex)
         {
             ex.printStackTrace();
         }
-        finally
-        {
-            try
-            {
-                if(cnn != null){cnn.close();}
-                if(cs != null){cs.close();}
-                if(rs != null){rs.close();}
-            }
-            catch(SQLException ex)
-            {
-                ex.printStackTrace();
-            }
-        }
-        
-        return autogenera_codprod;
+        return autogenera;
     }
-    
-    public boolean Insert_ProductosD(ProductosDTO producto)
-    {
-        Connection cnn = null;
-        CallableStatement cs = null;
 
-        boolean registroExitoso = false;
-        try
-        {
-            cnn = ConexionBD.obtenerConexion();
-            String sql = "{call sp_Insert_Productos(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
-            
-            cs = cnn.prepareCall(sql);
-            
-            cs.setString(1,producto.getProducto_ID());
-            cs.setString(2, producto.getNombreProducto());
-            cs.setString(3, producto.getEstadoProducto()); 
-            cs.setInt(4, producto.getCategoria_ID());   
-            cs.setInt(5,producto.getMarcaProducto_ID());
-            cs.setString(6, producto.getDescripcion());
-            cs.setString(7, producto.getUnidadMedida());
-            cs.setDouble(8, producto.getStockFinal());   
-            cs.setDouble(9,producto.getPrecioCosto());
-            cs.setDouble(10, producto.getPrecioVenta());
-            cs.setDouble(11, producto.getPrecioLimite());   
-            cs.setDouble(12,producto.getMargenUtil());
-            cs.setDouble(13, producto.getPeso());
-            cs.setString(14, producto.getImagen());   
-            cs.setString(15,producto.getCodigoBarra());
-            cs.setString(16, producto.getCodEmp());  
-            cs.setString(17, producto.getTipoProd());  
-            cs.setString(18, producto.getTipoBien_ID());  
-
-            int filasAfectadas = cs.executeUpdate();
-            if (filasAfectadas > 0 ) registroExitoso = true;
-        }
-        catch(SQLException ex)
-        {
-            ex.printStackTrace();
-        }
-        finally
-        {
-            try
-            {
-                if(cnn != null){cnn.close();}
-                if(cs != null){cs.close();}
-            }
-            catch(Exception ex){}
-        }
-        
-        return registroExitoso;
-    }
-    
-    public boolean Update_Productos(ProductosDTO producto)
+    /**
+     * sp_ListaDetalleVentaXProd @Producto_ID: si el producto ya tiene ventas,
+     * frm_Productos bloquea el stock y actualiza con sp_Update_Productos2.
+     */
+    public boolean TieneVentas(String productoId)
     {
-        Connection cnn = null;
-        CallableStatement cs = null;
-        boolean registroExitoso = false;
-        try
+        String sql = "{call sp_ListaDetalleVentaXProd(?)}";
+        try (Connection cn = ConexionBD.obtenerConexion();
+             CallableStatement cs = cn.prepareCall(sql))
         {
-            cnn = ConexionBD.obtenerConexion();
-            String sql = "{call sp_Update_Productos(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
-            cs = cnn.prepareCall(sql);
-            
-            cs.setString(1,producto.getProducto_ID());
-            cs.setString(2, producto.getNombreProducto());
-            cs.setString(3, producto.getEstadoProducto()); 
-            cs.setInt(4, producto.getCategoria_ID());   
-            cs.setInt(5,producto.getMarcaProducto_ID());
-            cs.setString(6, producto.getDescripcion());
-            cs.setString(7, producto.getUnidadMedida());
-            cs.setDouble(8, producto.getStockFinal());   
-            cs.setDouble(9,producto.getPrecioCosto());
-            cs.setDouble(10, producto.getPrecioVenta());
-            cs.setDouble(11, producto.getPrecioLimite());   
-            cs.setDouble(12,producto.getMargenUtil());
-            cs.setDouble(13, producto.getPeso());
-            cs.setString(14, producto.getImagen());   
-            cs.setString(15,producto.getCodigoBarra());
-            cs.setString(16, producto.getCodEmp());  
-            cs.setString(17, producto.getTipoProd());  
-            cs.setString(18, producto.getTipoBien_ID());  
-            
-            int filasAfectadas = cs.executeUpdate();
-            if(filasAfectadas > 0){registroExitoso = true;}
+            cs.setString("Producto_ID", productoId);
+            try (ResultSet rs = cs.executeQuery())
+            {
+                return rs.next();
+            }
         }
-        catch(SQLException ex)
+        catch (SQLException ex)
         {
             ex.printStackTrace();
+            return true;   // ante la duda no se permite cambiar el stock
         }
-        finally
-        {
-            try
-            {
-                if(cnn != null){cnn.close();}
-                if(cs != null){cs.close();}
-            }
-            catch(Exception ex){}
-        }
-        
-        return registroExitoso;
     }
+
+    /** sp_Insert_Productos. Devuelve true si el procedimiento terminó sin error. */
+    public boolean Insert_ProductosD(ProductosDTO p)
+    {
+        String sql = "{call sp_Insert_Productos(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        try (Connection cn = ConexionBD.obtenerConexion();
+             CallableStatement cs = cn.prepareCall(sql))
+        {
+            asignarComunes(cs, p, true);
+            cs.execute();
+            return true;
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Actualiza el producto.si el stock se puede editar (sin ventas) usa
+     * sp_Update_Productos; si ya tiene ventas usa sp_Update_Productos2, que no recibe StockFinal.
+     */
+    public boolean Update_Productos(ProductosDTO p, boolean incluyeStock)
+    {
+        String sql = incluyeStock
+                ? "{call sp_Update_Productos(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}"
+                : "{call sp_Update_Productos2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        try (Connection cn = ConexionBD.obtenerConexion();
+             CallableStatement cs = cn.prepareCall(sql))
+        {
+            asignarComunes(cs, p, incluyeStock);
+            cs.execute();
+            return true;
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    /** Parámetros que envía Alm_Mante_ProductosD (Insert / Update / Update2). */
+    private void asignarComunes(CallableStatement cs, ProductosDTO p, boolean incluyeStock) throws SQLException
+    {
+        cs.setString("Producto_ID", p.getProducto_ID());
+        cs.setString("NombreProducto", p.getNombreProducto());
+        cs.setString("EstadoProducto", p.getEstadoProducto());
+        cs.setInt("Categoria_ID", p.getCategoria_ID());
+        cs.setString("MarcaProducto_ID", String.valueOf(p.getMarcaProducto_ID()));
+        cs.setString("Descripcion", p.getDescripcion());
+        cs.setString("UnidadMedida", p.getUnidadMedida());
+        if (incluyeStock)
+        {
+            cs.setDouble("StockFinal", p.getStockFinal());
+        }
+        cs.setBigDecimal("PrecioCosto", dinero(p.getPrecioCosto()));
+        cs.setBigDecimal("PrecioVenta", dinero(p.getPrecioVenta()));
+        cs.setBigDecimal("PrecioLimite", dinero(p.getPrecioLimite()));
+        cs.setBigDecimal("MargenUtil", dinero(p.getMargenUtil()));
+        cs.setDouble("Peso", p.getPeso());
+        cs.setString("Imagen", p.getImagen() == null ? "" : p.getImagen());
+        cs.setString("CodigoBarra", p.getCodigoBarra() == null ? "" : p.getCodigoBarra());
+        cs.setString("CodEmp", p.getCodEmp());
+        cs.setString("TipoProd", p.getTipoProd());
+    }
+
+    private static java.math.BigDecimal dinero(double valor)
+    {
+        return java.math.BigDecimal.valueOf(valor).setScale(2, java.math.RoundingMode.HALF_UP);
+    }
+
+    /**
+     * sp_Update_Estado_Producto @Producto_ID, @EstadoProducto, @CodEmp.
+     * "Eliminar" en frm_Productos no borra: deja el producto Inactivo.
+     */
+    public boolean Update_Estado_Producto(String productoId, String estado, String codEmp)
+    {
+        String sql = "{call sp_Update_Estado_Producto(?,?,?)}";
+        try (Connection cn = ConexionBD.obtenerConexion();
+             CallableStatement cs = cn.prepareCall(sql))
+        {
+            cs.setString("Producto_ID", productoId);
+            cs.setString("EstadoProducto", estado);
+            cs.setString("CodEmp", codEmp);
+            cs.execute();
+            return true;
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    /** sp_Elim_Producto: borrado físico (no lo usa frm_Productos; se conserva por compatibilidad). */
     public boolean Elim_Producto(ProductosDTO producto)
     {
-        Connection cnn = null;
-        CallableStatement cs = null;
-        boolean productoEliminado = false;
-        try
+        String sql = "{call sp_Elim_Producto(?)}";
+        try (Connection cn = ConexionBD.obtenerConexion();
+             CallableStatement cs = cn.prepareCall(sql))
         {
-            cnn = ConexionBD.obtenerConexion();
-            String sql = "{call sp_Elim_Producto(?)}";
-            cs = cnn.prepareCall(sql);
-            
-            cs.setString(1,producto.getProducto_ID());
-
-            int filasAfectadas = cs.executeUpdate();
-            if(filasAfectadas > 0){productoEliminado = true;}
+            cs.setString(1, producto.getProducto_ID());
+            return cs.executeUpdate() > 0;
         }
-        catch(SQLException ex)
+        catch (SQLException ex)
         {
             ex.printStackTrace();
+            return false;
         }
-        finally
-        {
-            try
-            {
-                if(cnn != null){cnn.close();}
-                if(cs != null){cs.close();}
-            }
-            catch(Exception ex){}
-        }
-        
-        return productoEliminado;
     }
 }

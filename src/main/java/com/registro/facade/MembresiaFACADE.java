@@ -43,13 +43,21 @@ public class MembresiaFACADE {
     {
         return dao.ListaDetSuscripcionPeriodoClases(NroSuscripcion_id,Cliente_ID);
     }
-    public MembresiaDTO ListaFrecuenciaF()
+    public ArrayList<MembresiaDTO> ListaFrecuenciaF()
     {
         return dao.ListaFrecuencia();
     }
-    public MembresiaDTO ListaMembresiaF()
+    public ArrayList<MembresiaDTO> ListaMembresiaF()
     {
         return dao.ListaMembresia();
+    }
+    public MembresiaDTO ListaMembresiaXCodF(String CodigoM)
+    {
+        return dao.ListaMembresiaXCod(CodigoM);
+    }
+    public String autogeneraCodMembresiaF()
+    {
+        return dao.autogeneraCodMembresia();
     }
     public MembresiaDTO Listasuscripciones_MembresiaXCodMembresiaF(String CodEmp, String CodigoM)
     {

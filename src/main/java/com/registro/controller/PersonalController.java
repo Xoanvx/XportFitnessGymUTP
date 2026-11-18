@@ -19,7 +19,6 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet(name = "PersonalController", urlPatterns = {"/PersonalController"})
 public class PersonalController extends HttpServlet {
 
-    private static final String ROL_ADMIN = "Administrador";
     private static final String COD_EMP_DEFECTO = "01";
 
     private final UsuarioFACADE facade = new UsuarioFACADE();
@@ -38,7 +37,7 @@ public class PersonalController extends HttpServlet {
             return;
         }
 
-        if (!ROL_ADMIN.equalsIgnoreCase(logueado.getRol())) {
+        if (!LoginBean.tieneAccesoTotal(logueado)) {
             response.sendRedirect(request.getContextPath() + "/dashboard.xhtml");
             return;
         }
@@ -101,6 +100,12 @@ public class PersonalController extends HttpServlet {
         UsuarioDTO p = extraerPersonal(request);
         UsuarioDTO existente = null;
 
+        if (esActualizacion && PersonalBean.esCodigoProtegido(p.getPersonal_ID())) {
+            mensaje(sesion, "error", "El personal con código " + p.getPersonal_ID() + " es del sistema y no se puede modificar.");
+            redirigirListado(request, response);
+            return;
+        }
+
         if (esActualizacion) {
             existente = facade.buscarPersonal(p.getPersonal_ID());
             if (existente == null) {
@@ -149,6 +154,12 @@ public class PersonalController extends HttpServlet {
                           HttpSession sesion, UsuarioDTO logueado) throws IOException {
 
         int id = parsearId(request.getParameter("id"));
+
+        if (PersonalBean.esCodigoProtegido(id)) {
+            mensaje(sesion, "error", "El personal con código " + id + " es del sistema y no se puede eliminar.");
+            redirigirListado(request, response);
+            return;
+        }
 
         if (id == logueado.getPersonal_ID()) {
             mensaje(sesion, "error", "No puede eliminar su propio registro.");

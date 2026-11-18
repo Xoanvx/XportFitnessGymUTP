@@ -1,0 +1,133 @@
+<!-- Reporte de planes de membresía. Formato JasperReports 7.0.8 (editable en Jaspersoft Studio 7). -->
+<!-- Los datos los entrega ReportePlanesMembresiaServlet desde MembresiaFACADE (sp_ListaMembresia). -->
+<jasperReport name="PlanesMembresia" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenNoDataType="NoDataSection" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b01">
+	<parameter name="EMPRESA" class="java.lang.String"/>
+	<parameter name="FILTRO" class="java.lang.String"/>
+	<parameter name="USUARIO" class="java.lang.String"/>
+	<parameter name="FECHA" class="java.lang.String"/>
+	<field name="codigo" class="java.lang.String"/>
+	<field name="nombre" class="java.lang.String"/>
+	<field name="duracion" class="java.lang.String"/>
+	<field name="dias" class="java.lang.Integer"/>
+	<field name="limite" class="java.lang.Integer"/>
+	<field name="tarifa" class="java.lang.Double"/>
+	<field name="frecuencia" class="java.lang.String"/>
+	<field name="estado" class="java.lang.String"/>
+	<field name="activo" class="java.lang.Boolean"/>
+	<variable name="TOTAL_ACTIVOS" calculation="Sum" class="java.lang.Integer">
+		<expression><![CDATA[$F{activo} ? 1 : 0]]></expression>
+	</variable>
+	<background splitType="Stretch"/>
+	<title height="78" splitType="Stretch">
+		<element kind="rectangle" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b10" x="0" y="0" width="555" height="56" mode="Opaque" backcolor="#102653" forecolor="#102653"/>
+		<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b11" x="14" y="6" width="380" height="16" forecolor="#BFD0F5" fontSize="9.0" bold="true" vTextAlign="Middle">
+			<expression><![CDATA[$P{EMPRESA} == null ? "XPORT FITNESS GYM" : $P{EMPRESA}.toUpperCase()]]></expression>
+		</element>
+		<element kind="staticText" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b12" x="14" y="22" width="380" height="28" forecolor="#FFFFFF" fontSize="18.0" bold="true" vTextAlign="Middle">
+			<text><![CDATA[Planes de Membresía]]></text>
+		</element>
+		<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b13" x="394" y="6" width="150" height="22" forecolor="#FFFFFF" fontSize="8.0" hTextAlign="Right" vTextAlign="Middle">
+			<expression><![CDATA["Emitido: " + $P{FECHA}]]></expression>
+		</element>
+		<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b14" x="394" y="28" width="150" height="22" forecolor="#FFFFFF" fontSize="8.0" hTextAlign="Right" vTextAlign="Middle">
+			<expression><![CDATA[$P{USUARIO} == null ? "" : "Usuario: " + $P{USUARIO}]]></expression>
+		</element>
+		<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b15" x="0" y="60" width="555" height="16" forecolor="#64748B" fontSize="8.0" italic="true" vTextAlign="Middle">
+			<expression><![CDATA[$P{FILTRO} == null || $P{FILTRO}.trim().isEmpty() ? "Todos los planes registrados" : "Filtro aplicado: \"" + $P{FILTRO}.trim() + "\""]]></expression>
+		</element>
+	</title>
+	<columnHeader height="22" splitType="Stretch">
+		<element kind="staticText" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b21" x="0" y="0" width="48" height="22" mode="Opaque" backcolor="#275EF5" forecolor="#FFFFFF" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[Código]]></text>
+		</element>
+		<element kind="staticText" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b22" x="48" y="0" width="137" height="22" mode="Opaque" backcolor="#275EF5" forecolor="#FFFFFF" fontSize="8.0" bold="true" vTextAlign="Middle">
+			<text><![CDATA[Nombre]]></text>
+			<box leftPadding="5"/>
+		</element>
+		<element kind="staticText" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b23" x="185" y="0" width="105" height="22" mode="Opaque" backcolor="#275EF5" forecolor="#FFFFFF" fontSize="8.0" bold="true" vTextAlign="Middle">
+			<text><![CDATA[Duración]]></text>
+			<box leftPadding="5"/>
+		</element>
+		<element kind="staticText" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b24" x="290" y="0" width="42" height="22" mode="Opaque" backcolor="#275EF5" forecolor="#FFFFFF" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[Días]]></text>
+		</element>
+		<element kind="staticText" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b25" x="332" y="0" width="45" height="22" mode="Opaque" backcolor="#275EF5" forecolor="#FFFFFF" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[Límite]]></text>
+		</element>
+		<element kind="staticText" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b26" x="377" y="0" width="65" height="22" mode="Opaque" backcolor="#275EF5" forecolor="#FFFFFF" fontSize="8.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+			<text><![CDATA[Tarifa (S/)]]></text>
+			<box rightPadding="5"/>
+		</element>
+		<element kind="staticText" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b27" x="442" y="0" width="65" height="22" mode="Opaque" backcolor="#275EF5" forecolor="#FFFFFF" fontSize="8.0" bold="true" vTextAlign="Middle">
+			<text><![CDATA[Frecuencia]]></text>
+			<box leftPadding="5"/>
+		</element>
+		<element kind="staticText" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b28" x="507" y="0" width="48" height="22" mode="Opaque" backcolor="#275EF5" forecolor="#FFFFFF" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[Estado]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<element kind="rectangle" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b30" x="0" y="0" width="555" height="20" mode="Opaque" backcolor="#F1F5FB" forecolor="#F1F5FB">
+				<printWhenExpression><![CDATA[$V{REPORT_COUNT} % 2 == 0]]></printWhenExpression>
+			</element>
+			<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b31" x="0" y="0" width="48" height="20" forecolor="#275EF5" fontSize="8.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{codigo}]]></expression>
+			</element>
+			<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b32" x="48" y="0" width="137" height="20" forecolor="#102653" fontSize="8.0" vTextAlign="Middle" textAdjust="ScaleFont">
+				<expression><![CDATA[$F{nombre}]]></expression>
+				<box leftPadding="5"/>
+			</element>
+			<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b33" x="185" y="0" width="105" height="20" forecolor="#334155" fontSize="8.0" vTextAlign="Middle" textAdjust="ScaleFont">
+				<expression><![CDATA[$F{duracion}]]></expression>
+				<box leftPadding="5"/>
+			</element>
+			<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b34" x="290" y="0" width="42" height="20" forecolor="#334155" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{dias}]]></expression>
+			</element>
+			<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b35" x="332" y="0" width="45" height="20" forecolor="#334155" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{limite} == null || $F{limite} == 0 ? "Sin límite" : String.valueOf($F{limite})]]></expression>
+			</element>
+			<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b36" x="377" y="0" width="65" height="20" forecolor="#102653" fontSize="8.0" bold="true" hTextAlign="Right" vTextAlign="Middle" pattern="#,##0.00">
+				<expression><![CDATA[$F{tarifa}]]></expression>
+				<box rightPadding="5"/>
+			</element>
+			<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b37" x="442" y="0" width="65" height="20" forecolor="#334155" fontSize="8.0" vTextAlign="Middle" textAdjust="ScaleFont">
+				<expression><![CDATA[$F{frecuencia}]]></expression>
+				<box leftPadding="5"/>
+			</element>
+			<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b38" x="507" y="0" width="48" height="20" forecolor="#16A34A" fontSize="7.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{estado} == null ? "" : $F{estado}.trim().toUpperCase()]]></expression>
+				<printWhenExpression><![CDATA[$F{activo}]]></printWhenExpression>
+			</element>
+			<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b39" x="507" y="0" width="48" height="20" forecolor="#DC2626" fontSize="7.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{estado} == null ? "" : $F{estado}.trim().toUpperCase()]]></expression>
+				<printWhenExpression><![CDATA[!$F{activo}]]></printWhenExpression>
+			</element>
+			<element kind="line" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b3a" x="0" y="19" width="555" height="1" forecolor="#E2E8F0"/>
+		</band>
+	</detail>
+	<pageFooter height="22" splitType="Stretch">
+		<element kind="line" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b40" x="0" y="2" width="555" height="1" forecolor="#CBD5E1"/>
+		<element kind="staticText" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b41" x="0" y="4" width="300" height="16" forecolor="#94A3B8" fontSize="7.0" vTextAlign="Middle">
+			<text><![CDATA[Xport Fitness Gym · Reporte de planes de membresía]]></text>
+		</element>
+		<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b42" x="400" y="4" width="120" height="16" forecolor="#64748B" fontSize="8.0" hTextAlign="Right" vTextAlign="Middle">
+			<expression><![CDATA["Página " + $V{PAGE_NUMBER} + " de"]]></expression>
+		</element>
+		<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b43" x="520" y="4" width="35" height="16" forecolor="#64748B" fontSize="8.0" vTextAlign="Middle" evaluationTime="Report">
+			<expression><![CDATA[" " + $V{PAGE_NUMBER}]]></expression>
+		</element>
+	</pageFooter>
+	<summary height="40" splitType="Stretch">
+		<element kind="rectangle" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b50" x="0" y="10" width="555" height="24" mode="Opaque" backcolor="#EEF2F8" forecolor="#DCE5F1"/>
+		<element kind="textField" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b51" x="10" y="10" width="535" height="24" forecolor="#102653" fontSize="9.0" bold="true" vTextAlign="Middle">
+			<expression><![CDATA["Total de planes: " + $V{REPORT_COUNT} + "     ·     Activos: " + $V{TOTAL_ACTIVOS} + "     ·     Inactivos: " + ($V{REPORT_COUNT} - $V{TOTAL_ACTIVOS})]]></expression>
+		</element>
+	</summary>
+	<noData height="60" splitType="Stretch">
+		<element kind="staticText" uuid="4f1d2c7a-8b3e-4a51-9c62-1d7e0f3a5b60" x="0" y="20" width="555" height="24" forecolor="#64748B" fontSize="11.0" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[No se encontraron planes de membresía para el filtro indicado.]]></text>
+		</element>
+	</noData>
+</jasperReport>

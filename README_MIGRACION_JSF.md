@@ -20,9 +20,11 @@
 
 1. Abre esta carpeta como proyecto Maven.
 2. Configura el JDK del proyecto en 21.
-3. Configura estas variables de entorno para el proceso de Tomcat: `GYM_DB_URL`, `GYM_DB_USER` y `GYM_DB_PASSWORD`.
-   - `GYM_DB_URL` puede ser, por ejemplo, `jdbc:sqlserver://aplicacionesutp.ddns.net;instanceName=SQL2016;encrypt=false;trustServerCertificate=true`.
-   - `GYM_DB_USER` y `GYM_DB_PASSWORD` deben ser las credenciales SQL Server actuales de tu ambiente; no se guardan en el código fuente.
+3. Configura la conexión a SQL Server (las credenciales no se guardan en el código fuente). `ConexionBD` busca cada dato en este orden:
+   - Variables de entorno: `GYM_DB_URL`, `GYM_DB_USER`, `GYM_DB_PASSWORD`.
+   - Propiedades de la JVM: `-Dgym.db.url=...`, `-Dgym.db.user=...`, `-Dgym.db.password=...`.
+   - Archivo `gimnasio-bd.properties` (plantilla en `config/gimnasio-bd.properties.ejemplo`), buscado en la ruta de `GYM_DB_CONFIG`, en `<Tomcat>/conf/` y en la carpeta del usuario (`C:\Users\<usuario>\`).
+   - Ejemplo de URL: `jdbc:sqlserver://SERVIDOR;instanceName=INSTANCIA;databaseName=BDGimnasio;encrypt=false;trustServerCertificate=true`.
 4. Compila con `mvn clean package` o los comandos Maven equivalentes de NetBeans.
 5. Despliega `target/AplicacionWebGimnasio.war` en Tomcat 10.1.
 6. Abre `/AplicacionWebGimnasio/` o `/AplicacionWebGimnasio/login.xhtml`.

@@ -1,0 +1,100 @@
+/* Estilos de RegistrarAsistencia.xhtml (prefijo ra- para no chocar con diseingreso.css) */
+
+.ra-main{flex:1;min-width:0;padding:24px;background:#eef2f8;color:#102653}
+
+/* ---- Título ---- */
+.ra-titulo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    padding:14px 20px;margin-bottom:16px;border-radius:12px;background:linear-gradient(135deg,#102653 0%,#19396f 100%);color:#fff;
+    box-shadow:0 4px 14px rgba(16,38,83,.18)}
+.ra-titulo h1{margin:0;font-size:19px;letter-spacing:.4px;text-transform:uppercase}
+.ra-titulo h1 i{color:#83CFEA;margin-right:6px}
+.ra-titulo-ayuda{font-size:12px;color:#BFD0F5}
+
+/* ---- Rejilla general ---- */
+.ra-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+.ra-col-principal{display:flex;flex-direction:column;gap:16px;min-width:0}
+.ra-col-lateral{display:flex;flex-direction:column;gap:12px}
+
+.ra-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 2px 8px rgba(16,38,83,.05)}
+.ra-card-titulo{margin:0;padding:12px 16px;border-bottom:1px solid #eef1f6;font-size:13px;font-weight:700;color:#263B60;text-transform:uppercase;letter-spacing:.4px}
+
+/* ---- Registro de ingreso ---- */
+.ra-fila-ingreso{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:16px}
+.ra-ingreso-cuerpo{display:flex;gap:18px;padding:16px}
+.ra-huella{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 120px}
+.ra-huella-caja{width:120px;height:140px;border-radius:10px;background:#f4f5f7;border:1px dashed #cbd5e1;
+    display:flex;align-items:center;justify-content:center;font-size:54px;color:#94a3b8}
+.ra-huella span{font-size:12px;color:#64748b}
+
+.ra-ingreso-datos{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
+.ra-fecha-hora{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.ra-campo{display:flex;flex-direction:column;gap:5px}
+.ra-campo label{font-size:12px;font-weight:700;color:#263B60}
+.ra-dato{min-height:40px;display:flex;align-items:center;padding:0 12px;border:1px solid #CFD7E2;border-radius:9px;background:#f8fafc;font-size:15px;color:#243B60}
+.ra-hora{font-size:22px;font-weight:700;color:#102653;letter-spacing:1px}
+
+.ra-codigo-fila{display:flex;gap:10px}
+.ra-codigo-fila input{flex:1;min-width:0;box-sizing:border-box;height:46px;padding:0 14px;border:1px solid #CFD7E2;border-radius:9px;
+    font:700 20px Arial,Helvetica,sans-serif;color:#102653;outline:none;transition:border-color .15s,box-shadow .15s}
+.ra-codigo-fila input:focus{border-color:#2864F0;box-shadow:0 0 0 4px rgba(40,100,240,.12)}
+.ra-ayuda{margin:0;font-size:12px;color:#64748b}
+
+.ra-bienvenida{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:10px 14px;border-radius:9px;background:#E8F8EF;border:1px solid #B7E8CB}
+.ra-bienvenida[hidden]{display:none}
+.ra-bienvenida span{font-size:15px;color:#167344}
+.ra-bienvenida strong{font-size:19px;color:#0f5132}
+
+/* ---- Foto ---- */
+.ra-foto{overflow:hidden;display:flex;flex-direction:column}
+.ra-foto-titulo{padding:8px;text-align:center;background:#102653;color:#fff;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.ra-foto-marco{flex:1;min-height:190px;display:flex;align-items:center;justify-content:center;background:#f4f5f7;font-size:70px;color:#cbd5e1}
+.ra-foto-marco img{width:100%;height:100%;object-fit:cover}
+
+/* ---- Avisos ---- */
+.ra-avisos-cuerpo{padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.ra-aviso-vacio{margin:0;font-size:13px;color:#94a3b8}
+.ra-aviso{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 12px;border-radius:9px;font-size:14px}
+.ra-aviso strong{font-size:16px}
+.ra-aviso-info{background:#EFF5FF;color:#1e3a8a;border:1px solid #c7d8fb}
+.ra-aviso-deuda{background:#FDECEC;color:#B42318;border:1px solid #F5C2C0}
+.ra-aviso-error{background:#FFF7E6;color:#92400e;border:1px solid #FCD9A0}
+
+/* ---- Tablas ---- */
+.ra-barra{padding:9px 16px;background:#102653;color:#fff;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-radius:12px 12px 0 0}
+.ra-tabla-scroll{overflow-x:auto}
+.ra-tabla{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
+.ra-tabla th{background:#1e40af;color:#fff;padding:10px;text-align:left;font-weight:700}
+.ra-tabla td{padding:10px;border-bottom:1px solid #eef1f6;color:#334155}
+.ra-tabla tbody tr:hover{background:#f8fafc}
+.ra-tabla-centro th,.ra-tabla-centro td{text-align:center}
+.ra-fila-vacia td{text-align:center;color:#94a3b8;padding:18px}
+.ra-condicion{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#dcfce7;color:#15803d}
+
+.ra-historial-scroll{max-height:470px;overflow-y:auto}
+.ra-historial .ra-tabla th{position:sticky;top:0}
+
+/* ---- Botones ---- */
+.ra-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 16px;box-sizing:border-box;
+    border:0;border-radius:9px;font:700 14px Arial,Helvetica,sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap;
+    transition:background .15s,transform .05s}
+.ra-btn:active{transform:translateY(1px)}
+.ra-btn-ingresar{background:#102653;color:#fff}
+.ra-btn-ingresar:hover{background:#19396f}
+.ra-btn-ingresar:disabled{opacity:.5;cursor:not-allowed}
+.ra-botones{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ra-btn-nuevo{background:#2864F0;color:#fff;box-shadow:0 4px 10px rgba(40,100,240,.25)}
+.ra-btn-nuevo:hover{background:#174CC5}
+.ra-btn-salir{background:#fff;color:#263B60;border:1px solid #CFD7E2}
+.ra-btn-salir:hover{background:#F1F5F9;color:#263B60}
+
+/* ---- Responsive ---- */
+@media(max-width:1200px){.ra-grid{grid-template-columns:1fr}.ra-historial-scroll{max-height:300px}}
+@media(max-width:760px){
+    .ra-main{padding:12px}
+    .ra-fila-ingreso{grid-template-columns:1fr}
+    .ra-ingreso-cuerpo{flex-direction:column}
+    .ra-huella{flex-basis:auto}
+    .ra-huella-caja{width:100%;height:90px}
+    .ra-fecha-hora{grid-template-columns:1fr}
+    .ra-codigo-fila{flex-direction:column}
+}

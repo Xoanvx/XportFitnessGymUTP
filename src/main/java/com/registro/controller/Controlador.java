@@ -74,7 +74,10 @@ protected void processRequest(HttpServletRequest request,
 
                     sesion.setAttribute("usuarioAutenticado", usuarioDTO);
                     sesion.setAttribute("usuario", usuario);
-                    sesion.setAttribute("rol", usuarioDTO.getRol());
+                    String rol = usuarioDTO.getRol() == null ? "" : usuarioDTO.getRol().trim();
+                    sesion.setAttribute("rol", rol);
+                    sesion.setAttribute("area", usuarioDTO.getArea() == null ? "" : usuarioDTO.getArea().trim());
+                    sesion.setAttribute("esAdmin", LoginBean.tieneAccesoTotal(usuarioDTO));
 
                     // Redirigir al dashboard después del login exitoso
                     response.sendRedirect(

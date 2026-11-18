@@ -5,7 +5,6 @@ import com.registro.dto.AreaDTO;
 import com.registro.dto.UsuarioDTO;
 import com.registro.dto.RolDTO;
 import org.mindrot.jbcrypt.BCrypt;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -215,7 +214,7 @@ public class UsuarioDAO {
            String contraseñaEncriptada = Seguridad.encriptarContraseña(usuario.getContraseña());
            usuario.setContraseña(contraseñaEncriptada);
        }
-    // Corregido: Se agregó un "?" adicional al final para completar los 20 parámetros
+
     String sql = "{? = call sp_Insert_UsuarioPersonal(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
 
     try (Connection cn = ConexionBD.obtenerConexion();
@@ -240,7 +239,7 @@ public class UsuarioDAO {
         st.setString(17, usuario.getFoto());
         st.setInt(18, usuario.getUsuarioMod());
         st.setInt(19, usuario.getRol_ID());
-        st.setInt(20, usuario.getOpcUserSist()); // Este parámetro requería el "?" número 20
+        st.setInt(20, usuario.getOpcUserSist());
 
         st.execute();
         return st.getInt(1);
@@ -275,4 +274,53 @@ public class UsuarioDAO {
             return -1;
         }
     }
+    public boolean PersonalUsuario_ActualizaClave(UsuarioDTO usuario)
+    {
+        Connection cn = null;
+        CallableStatement cs = null;
+        boolean ResultadoExitoso = false;
+        
+        try
+        {
+            if (usuario == null || usuario.getPersonal_ID() <= 0
+                    || usuario.getContraseña() == null || usuario.getContraseña().trim().isEmpty()) {
+                return false;
+            }
+
+            // Misma encriptación que usa el login (Seguridad.encriptarContraseña)
+            String claveEncriptada = Seguridad.encriptarContraseña(usuario.getContraseña());
+
+            cn = ConexionBD.obtenerConexion();
+            String sql = "{call sp_PersonalUsuario_ActualizaClave(?,?)}";
+
+            cs = cn.prepareCall(sql);
+
+            cs.setInt(1,usuario.getPersonal_ID());
+            cs.setString(2,claveEncriptada);
+
+            // El SP usa SET NOCOUNT ON: no devuelve filas afectadas,
+            // por eso el éxito es que se ejecute sin error.
+            cs.execute();
+            ResultadoExitoso = true;
+
+        }
+        catch(SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                if (cn!=null)cn.close();
+                if (cs !=null)cs.close();
+            }
+            catch(Exception ex)
+            {
+                
+            }
+        }
+        return ResultadoExitoso;
+    }
+    
 }

@@ -8,7 +8,7 @@
     <cc:attribute name="opcion" type="java.lang.String" default=""/>
 </cc:interface>
 <cc:implementation>
-    <ui:fragment rendered="#{sessionScope.rol eq 'Administrador' or sessionScope.rol eq 'ADMIN'}">
+    <ui:fragment rendered="#{sessionScope.esAdmin}">
         <li class="menu-desplegable #{cc.attrs.opcion eq 'listarProductos' or cc.attrs.opcion eq 'nuevoProducto' or cc.attrs.opcion eq 'listarCategorias' or cc.attrs.opcion eq 'nuevaCategoria' or cc.attrs.opcion eq 'listarMarcas' or cc.attrs.opcion eq 'nuevaMarca' ? 'abierto' : ''}" id="menuCatalogo">
             <a href="#" class="menu-enlace" onclick="toggleSubmenu(event, 'submenuCatalogo')"
                aria-expanded="#{cc.attrs.opcion eq 'listarProductos' or cc.attrs.opcion eq 'nuevoProducto' or cc.attrs.opcion eq 'listarCategorias' or cc.attrs.opcion eq 'nuevaCategoria' or cc.attrs.opcion eq 'listarMarcas' or cc.attrs.opcion eq 'nuevaMarca'}">

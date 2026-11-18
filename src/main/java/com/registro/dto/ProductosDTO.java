@@ -8,7 +8,7 @@ package com.registro.dto;
  *
  * @author Ing
  */
-public class ProductosDTO {
+public class ProductosDTO implements java.io.Serializable {
     
  private String Producto_ID;      
  private String NombreProducto;   
@@ -31,7 +31,11 @@ public class ProductosDTO {
  
  private String DescripcionTipo;
  private String EstadoTipo;
- 
+
+ // Nombres que devuelven los listados (sp_Lista_ProductosGral_Activos y búsquedas)
+ private String Categoria;
+ private String Marca;
+
  public ProductosDTO(){
      
  }
@@ -120,4 +124,16 @@ public class ProductosDTO {
     
     public String getEstadoTipo(){ return EstadoTipo;}
     public void setEstadoTipo(String EstadoTipo){ this.EstadoTipo = EstadoTipo;}
+
+    public String getCategoria(){ return Categoria;}
+    public void setCategoria(String Categoria){ this.Categoria = Categoria;}
+
+    public String getMarca(){ return Marca;}
+    public void setMarca(String Marca){ this.Marca = Marca;}
+
+    /** Utilidad en soles: PrecioVenta - PrecioCosto (como txtutil de frm_Productos). */
+    public double getUtilidad(){ return Math.round((PrecioVenta - PrecioCosto) * 100.0) / 100.0;}
+
+    /** "VENTA" o "SERVICIO" según TipoProd (V / S). */
+    public String getTipoProdTexto(){ return "S".equalsIgnoreCase(TipoProd == null ? "" : TipoProd.trim()) ? "SERVICIO" : "VENTA";}
 }

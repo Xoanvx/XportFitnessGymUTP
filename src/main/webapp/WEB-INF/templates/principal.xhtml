@@ -4,6 +4,7 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:app="jakarta.faces.composite/components">
+<ui:insert name="metadata" />
 <h:head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,15 +12,46 @@
     <link rel="stylesheet" href="#{request.contextPath}/css/diseingreso.css" />
     <link rel="stylesheet" href="#{request.contextPath}/css/menu.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link rel="stylesheet" href="#{request.contextPath}/css/barra-usuario.css?v=1" />
+    <link rel="stylesheet" href="#{request.contextPath}/css/paginacion.css?v=1" />
     <ui:insert name="styles" />
 </h:head>
 <h:body>
     <div class="dashboard-container">
         <app:menuLateral opcion="#{menuOpcion}" submenu="#{menuSubmenu}" />
-        <ui:insert name="content" />
+        <div class="app-contenido">
+            <!-- Barra superior: usuario / personal que inició sesión -->
+            <header class="barra-usuario">
+                <div class="barra-usuario-izq">
+                    <i class="fa-solid fa-dumbbell"></i>
+                    <span class="barra-usuario-negocio">Xport Fitness Gym</span>
+                    <span class="barra-usuario-fecha" id="barraUsuarioFecha"></span>
+                </div>
+                <div class="barra-usuario-der" title="Usuario con el que ingresó al sistema">
+                    <div class="barra-usuario-avatar"><i class="fa-solid fa-user"></i></div>
+                    <div class="barra-usuario-datos">
+                        <strong>#{empty sessionScope.usuarioAutenticado.nombreCompleto ? sessionScope.usuario : sessionScope.usuarioAutenticado.nombreCompleto}</strong>
+                        <span>
+                            <i class="fa-solid fa-circle-user"></i> #{sessionScope.usuario}
+                            <ui:fragment rendered="#{not empty sessionScope.rol}">
+                                <em class="barra-usuario-rol">#{sessionScope.rol}</em>
+                            </ui:fragment>
+                        </span>
+                    </div>
+                </div>
+            </header>
+            <ui:insert name="content" />
+        </div>
     </div>
     <script src="#{request.contextPath}/js/menu.js"></script>
     <script src="#{request.contextPath}/js/diseingreso.js"></script>
+    <script src="#{request.contextPath}/js/paginacion.js?v=1"></script>
+    <script>
+        (function () {
+            var f = document.getElementById("barraUsuarioFecha");
+            if (f) f.textContent = new Date().toLocaleDateString("es-PE", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+        }());
+    </script>
     <ui:insert name="scripts" />
 </h:body>
 </html>

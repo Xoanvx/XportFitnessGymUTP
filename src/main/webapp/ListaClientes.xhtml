@@ -4,8 +4,14 @@
     template="/WEB-INF/templates/principal.xhtml">
     <ui:param name="menuOpcion" value="listarSocios" />
     <ui:param name="menuSubmenu" value="socios" />
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewParam name="tam" value="#{clienteBean.tamPagina}" />
+            <f:viewParam name="pagina" value="#{clienteBean.pagina}" />
+        </f:metadata>
+    </ui:define>
     <ui:define name="title">Ver Socios | Xport Fitness Gym</ui:define>
-    <ui:define name="styles"><link rel="stylesheet" href="#{request.contextPath}/css/listaclientes.css" /></ui:define>
+    <ui:define name="styles"><link rel="stylesheet" href="#{request.contextPath}/css/listaclientes.css?v=2" /></ui:define>
     <ui:define name="content">
         <main class="dashboard-main">
             <section class="panel panel-listaclientes">       
@@ -55,11 +61,11 @@
 
                 <div class="clientes-resumen">
                     <div><i class="fa-solid fa-address-book"></i><span>Listado de clientes</span></div>
-                    <span class="clientes-total">Registros: <strong>#{clienteBean.listaClientes.size()}</strong></span>
+                    <span class="clientes-total">Registros: <strong>#{clienteBean.totalRegistros}</strong></span>
                 </div>
 
                 <div class="clientes-tabla-scroll">
-                    <h:dataTable value="#{clienteBean.listaClientes}" var="cliente" styleClass="tabla-clientes"
+                    <h:dataTable value="#{clienteBean.clientesPagina}" var="cliente" styleClass="tabla-clientes"
                                  rendered="#{not empty clienteBean.listaClientes}">
                         <h:column><f:facet name="header">ID</f:facet><h:outputText value="#{cliente.cliente_ID}" /></h:column>
                         <h:column><f:facet name="header">Razón Social</f:facet><span class="cliente-razon"><h:outputText value="#{cliente.razonSocial}" /></span></h:column>
@@ -81,6 +87,30 @@
                         <i class="fa-solid fa-circle-info"></i> No hay clientes para mostrar.
                     </h:panelGroup>
                 </div>
+
+                <h:panelGroup layout="block" styleClass="clientes-paginacion" rendered="#{clienteBean.totalRegistros gt 0}">
+                    <span class="pag-info">Mostrando <strong>#{clienteBean.desde}</strong> a <strong>#{clienteBean.hasta}</strong> de <strong>#{clienteBean.totalRegistros}</strong> socios</span>
+
+                    <nav class="pag-botones" aria-label="Paginación de socios">
+                        <a href="#{request.contextPath}/ListaClientes.xhtml?tam=#{clienteBean.tamPagina}&amp;pagina=1" class="pag-btn #{clienteBean.pagina eq 1 ? 'pag-deshabilitado' : ''}" title="Primera página"><i class="fa-solid fa-angles-left"></i></a>
+                        <a href="#{request.contextPath}/ListaClientes.xhtml?tam=#{clienteBean.tamPagina}&amp;pagina=#{clienteBean.pagina - 1}" class="pag-btn #{clienteBean.pagina eq 1 ? 'pag-deshabilitado' : ''}" title="Anterior"><i class="fa-solid fa-angle-left"></i></a>
+                        <ui:repeat value="#{clienteBean.paginasVisibles}" var="num">
+                            <a href="#{request.contextPath}/ListaClientes.xhtml?tam=#{clienteBean.tamPagina}&amp;pagina=#{num}" class="pag-btn #{num eq clienteBean.pagina ? 'pag-actual' : ''}">#{num}</a>
+                        </ui:repeat>
+                        <a href="#{request.contextPath}/ListaClientes.xhtml?tam=#{clienteBean.tamPagina}&amp;pagina=#{clienteBean.pagina + 1}" class="pag-btn #{clienteBean.pagina eq clienteBean.totalPaginas ? 'pag-deshabilitado' : ''}" title="Siguiente"><i class="fa-solid fa-angle-right"></i></a>
+                        <a href="#{request.contextPath}/ListaClientes.xhtml?tam=#{clienteBean.tamPagina}&amp;pagina=#{clienteBean.totalPaginas}" class="pag-btn #{clienteBean.pagina eq clienteBean.totalPaginas ? 'pag-deshabilitado' : ''}" title="Última página"><i class="fa-solid fa-angles-right"></i></a>
+                    </nav>
+
+                    <form method="get" action="#{request.contextPath}/ListaClientes.xhtml" class="pag-tamano">
+                        <label for="tamPagina">Mostrar</label>
+                        <select id="tamPagina" name="tam" onchange="this.form.submit()">
+                            <ui:repeat value="#{clienteBean.tamanosPagina}" var="t">
+                                <option value="#{t}" selected="#{t eq clienteBean.tamPagina ? 'selected' : null}">#{t}</option>
+                            </ui:repeat>
+                        </select>
+                        <span>por página</span>
+                    </form>
+                </h:panelGroup>
                 <footer class="clientes-footer"><i class="fa-solid fa-circle-info"></i> Los datos se consultan mediante ClienteFACADE.</footer>
             </section>
         </main>

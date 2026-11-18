@@ -1,0 +1,65 @@
+/* Estilos de CambiarClave.xhtml */
+
+/* ---- Contenedor: centra la tarjeta en todo el espacio disponible ---- */
+.clave-main{flex:1;min-width:0;min-height:100vh;box-sizing:border-box;padding:32px 20px;
+    display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 20% 15%,#dbe7ff 0,transparent 45%),radial-gradient(circle at 85% 90%,#d6f1fa 0,transparent 40%),#eef2f8}
+.clave-card{width:100%;max-width:440px;background:#fff;border:1px solid #e2e8f0;border-radius:18px;
+    box-shadow:0 18px 40px rgba(16,38,83,.12),0 2px 6px rgba(16,38,83,.06);overflow:hidden}
+
+/* ---- Cabecera centrada ---- */
+.clave-cabecera{position:relative;text-align:center;padding:30px 28px 26px;background:linear-gradient(135deg,#102653 0%,#19396f 100%);color:#fff}
+.clave-cabecera::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,#2864F0,#83CFEA)}
+.clave-icono{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:rgba(131,207,234,.16);border:2px solid rgba(131,207,234,.45);font-size:26px;color:#83CFEA}
+.clave-cabecera h1{margin:0;font-size:20px;letter-spacing:.2px;color:#fff}
+.clave-cabecera p{margin:6px auto 0;max-width:300px;font-size:12.5px;line-height:1.45;color:#BFD0F5}
+
+/* ---- Cuerpo ---- */
+.clave-cuerpo{padding:24px 28px 28px;display:flex;flex-direction:column;gap:16px}
+.clave-campo{display:flex;flex-direction:column;gap:7px}
+.clave-campo > label{font-size:12px;font-weight:700;color:#263B60;text-transform:uppercase;letter-spacing:.4px}
+.clave-input{position:relative;display:flex;align-items:center}
+.clave-input > i.icono-campo{position:absolute;left:13px;color:#94A3B8;font-size:14px;pointer-events:none}
+.clave-input input,.clave-input select{width:100%;box-sizing:border-box;border:1px solid #CFD7E2;border-radius:10px;background:#fff;
+    padding:11px 42px 11px 38px;color:#243B60;font:14px Arial,Helvetica,sans-serif;outline:none;transition:border-color .15s,box-shadow .15s}
+.clave-input select{padding-right:14px;cursor:pointer}
+.clave-input input:focus,.clave-input select:focus{border-color:#2864F0;box-shadow:0 0 0 4px rgba(40,100,240,.12)}
+.clave-input:focus-within > i.icono-campo{color:#2864F0}
+.clave-input input[readonly]{background:#F1F4F9;color:#475569}
+.ver-clave{position:absolute;right:6px;border:0;background:transparent;color:#94A3B8;width:32px;height:32px;border-radius:8px;cursor:pointer}
+.ver-clave:hover{background:#EFF5FF;color:#2864F0}
+.clave-ayuda{font-size:11.5px;color:#64748B}
+.clave-separador{display:flex;align-items:center;gap:10px;color:#94A3B8;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.clave-separador::before,.clave-separador::after{content:"";flex:1;border-top:1px solid #E2E8F0}
+
+/* ---- Indicador de seguridad ---- */
+.fuerza{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:2px}
+.fuerza span{height:5px;border-radius:99px;background:#E2E8F0;transition:background .2s}
+.fuerza[data-nivel="1"] span:nth-child(-n+1){background:#EF4444}
+.fuerza[data-nivel="2"] span:nth-child(-n+2){background:#F59E0B}
+.fuerza[data-nivel="3"] span:nth-child(-n+3){background:#3B82F6}
+.fuerza[data-nivel="4"] span{background:#16A34A}
+.coincide{font-size:11.5px;font-weight:600;min-height:14px}
+.coincide.ok{color:#16A34A}
+.coincide.no{color:#DC2626}
+
+/* ---- Botones ---- */
+.clave-botones{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.clave-btn{border:0;border-radius:10px;min-height:44px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s,transform .05s}
+.clave-btn:active{transform:translateY(1px)}
+.clave-btn-guardar{background:#2864F0;color:#fff;box-shadow:0 6px 14px rgba(40,100,240,.25)}
+.clave-btn-guardar:hover{background:#174CC5}
+.clave-btn-cancelar{background:#fff;color:#263B60;border:1px solid #CFD7E2}
+.clave-btn-cancelar:hover{background:#F1F5F9}
+
+/* ---- Mensajes ---- */
+.clave-mensajes{list-style:none;margin:0;padding:0}
+.clave-mensajes:empty{display:none}
+.clave-mensajes li{display:flex;gap:8px;align-items:flex-start;padding:11px 13px;border-radius:10px;font-size:13px;line-height:1.4}
+.clave-mensajes li + li{margin-top:6px}
+.clave-mensajes .msg-error{background:#FDECEC;color:#B42318;border:1px solid #F5C2C0}
+.clave-mensajes .msg-ok{background:#E8F8EF;color:#167344;border:1px solid #B7E8CB}
+
+@media(max-width:900px){.clave-main{min-height:auto;padding:24px 14px}}
+@media(max-width:480px){.clave-cuerpo{padding:20px 18px 22px}.clave-cabecera{padding:24px 18px 22px}.clave-botones{grid-template-columns:1fr}}

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<!--
+    Ver Suscripciones de Membresía.
+    Estructura visual (datos de ejemplo); se conectará a SuscripcionMembresiaBean / MembresiaFACADE.
+-->
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="jakarta.faces.facelets"
+    xmlns:h="jakarta.faces.html"
+    template="/WEB-INF/templates/principal.xhtml">
+
+    <ui:param name="menuOpcion" value="listarSuscripciones" />
+    <ui:param name="menuSubmenu" value="membresias" />
+
+    <ui:define name="title">
+        Suscripciones de Membresía | Xport Fitness Gym
+    </ui:define>
+
+    <ui:define name="styles">
+
+        <link rel="stylesheet" href="#{request.contextPath}/css/diseingreso.css" />
+        <link rel="stylesheet" href="#{request.contextPath}/css/gastos.css" />
+        <link rel="stylesheet" href="#{request.contextPath}/css/productos-dashboard.css" />
+        <link rel="stylesheet" href="#{request.contextPath}/css/catalogo.css" />
+        <link rel="stylesheet" href="#{request.contextPath}/css/planes-membresia.css" />
+
+        <style type="text/css">
+
+            .planes-main {
+                flex: 1;
+                min-width: 0;
+                padding: 28px;
+                background: #eef2f8;
+            }
+
+            .planes-main .gastos-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .planes-main .productos-nuevo {
+                text-decoration: none;
+            }
+
+            .planes-main .catalogo-tabs {
+                margin-top: 22px;
+            }
+
+            .planes-main .catalogo-tab {
+                text-decoration: none;
+            }
+
+            .planes-main .planes-listado {
+                margin-top: 20px;
+            }
+
+            .planes-main .planes-tabla {
+                width: 100%;
+            }
+
+            .planes-main .plan-codigo {
+                color: #275ef5;
+            }
+
+            .planes-main .duracion-dias {
+                display: block;
+                color: #64748b;
+                margin-top: 4px;
+            }
+
+            .planes-main .mov-info {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .planes-main .mov-info small {
+                color: #16a34a;
+                font-size: 10px;
+                font-weight: 600;
+            }
+
+            .planes-main .catalogo-eliminar-form {
+                display: inline;
+            }
+
+            .planes-main .acciones {
+                white-space: nowrap;
+            }
+
+            @media(max-width: 650px) {
+                .planes-main {
+                    padding: 12px;
+                }
+            }
+            
+            /* ===== BARRA DE BÚSQUEDA DE PLANES ===== */
+
+            .planes-main .productos-toolbar {
+                display: flex;
+                align-items: center;
+                gap: 9px;
+                flex-wrap: wrap;
+                margin: 20px 0;
+            }
+
+            .planes-main .busqueda-productos {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 0 12px;
+                height: 40px;
+                background: white;
+                border: 1px solid #cbd5e1;
+                border-radius: 8px;
+                color: #64748b;
+                box-sizing: border-box;
+            }
+
+            .planes-main .busqueda-productos input {
+                border: none;
+                outline: none;
+                width: 250px;
+                height: 100%;
+                font-size: 12px;
+                color: #334155;
+                background: transparent;
+            }
+
+            .planes-main .catalogo-buscar,
+            .planes-main .catalogo-limpiar {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 7px;
+                height: 40px;
+                padding: 0 16px;
+                border-radius: 8px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                text-decoration: none;
+                box-sizing: border-box;
+                transition: background .2s, border-color .2s;
+            }
+
+            /* Botón Buscar */
+
+            .planes-main button.catalogo-buscar {
+                background: #275ef5;
+                color: white;
+                border: 1px solid #275ef5;
+            }
+
+            .planes-main button.catalogo-buscar:hover {
+                background: #1948cf;
+            }
+
+            /* Botón Limpiar */
+
+            .planes-main button.catalogo-limpiar {
+                background: white;
+                color: #64748b;
+                border: 1px solid #cbd5e1;
+            }
+
+            .planes-main button.catalogo-limpiar:hover {
+                background: #f1f5f9;
+                color: #102653;
+            }
+
+            /* Botón Reporte */
+
+            .planes-main .reporte-link {
+                background: #102653;
+                color: white;
+                border: 1px solid #102653;
+            }
+
+            .planes-main .reporte-link:hover {
+                background: #19396f;
+            }
+
+            /* Adaptación móvil */
+
+            @media(max-width: 600px) {
+                .planes-main .productos-toolbar {
+                    align-items: stretch;
+                }
+
+                .planes-main .busqueda-productos {
+                    width: 100%;
+                }
+
+                .planes-main .busqueda-productos input {
+                    width: 100%;
+                }
+            }
+
+            .planes-main .busqueda-fecha {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                height: 40px;
+                padding: 0 10px;
+                background: white;
+                border: 1px solid #cbd5e1;
+                border-radius: 8px;
+                color: #64748b;
+                font-size: 12px;
+                box-sizing: border-box;
+            }
+
+            .planes-main .busqueda-fecha input {
+                border: none;
+                outline: none;
+                height: 100%;
+                font-size: 12px;
+                color: #334155;
+                background: transparent;
+            }
+
+            .planes-main .vigente-si,
+            .planes-main .vigente-no {
+                display: inline-block;
+                padding: 3px 10px;
+                border-radius: 999px;
+                font-size: 10px;
+                font-weight: 700;
+            }
+
+            .planes-main .vigente-si { background: #dcfce7; color: #166534; }
+            .planes-main .vigente-no { background: #fee2e2; color: #b91c1c; }
+
+            .planes-main .socio-doc {
+                display: block;
+                color: #64748b;
+                font-size: 11px;
+                margin-top: 3px;
+            }
+        </style>
+
+    </ui:define>
+
+    <ui:define name="content">
+
+        <main class="gastos-main catalogo-main planes-main">
+
+            <!-- ENCABEZADO -->
+            <header class="gastos-header">
+
+                <div>
+                    <p class="gastos-eyebrow">MEMBRESÍAS</p>
+                    <h1>Suscripciones de Membresía</h1>
+                    <p class="gastos-subtitle">
+                        Consulta las membresías contratadas por los socios, su vigencia y pago.
+                    </p>
+                </div>
+
+                <h:link outcome="/membresias.xhtml" styleClass="periodo productos-nuevo">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Nueva suscripción</span>
+                </h:link>
+
+            </header>
+
+            <!-- PESTAÑAS -->
+            <nav class="catalogo-tabs" aria-label="Módulos de membresía">
+
+                <h:link outcome="/membresias.xhtml" styleClass="catalogo-tab">
+                    <i class="fa-solid fa-file-signature"></i>
+                    Suscripción
+                </h:link>
+
+                <h:link outcome="/ListaSuscripcionesMembresia.xhtml" styleClass="catalogo-tab seleccionado">
+                    <i class="fa-solid fa-address-book"></i>
+                    Suscripciones
+                </h:link>
+
+                <h:link outcome="/ListaPlanesMembresia.xhtml" styleClass="catalogo-tab">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    Planes
+                </h:link>
+
+            </nav>
+
+            <!-- TARJETAS DE RESUMEN -->
+            <section class="resumen-grid catalogo-resumen">
+
+                <article class="resumen-card">
+                    <div class="resumen-icon">
+                        <i class="fa-solid fa-address-book"></i>
+                    </div>
+                    <p class="resumen-label">Suscripciones</p>
+                    <p class="resumen-value">4</p>
+                    <span class="resumen-foot">En el periodo consultado</span>
+                </article>
+
+                <article class="resumen-card">
+                    <div class="resumen-icon catalogo-icon-green">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <p class="resumen-label">Vigentes</p>
+                    <p class="resumen-value">3</p>
+                    <span class="resumen-foot">Con acceso al gimnasio</span>
+                </article>
+
+                <article class="resumen-card">
+                    <div class="resumen-icon catalogo-icon-purple">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                    <p class="resumen-label">Total cobrado</p>
+                    <p class="resumen-value catalogo-value-label">S/ 1,396.00</p>
+                    <span class="resumen-foot">Suma de suscripciones</span>
+                </article>
+
+            </section>
+
+            <!-- LISTADO -->
+            <section class="contenido-card catalogo-listado planes-listado">
+
+                <div class="card-heading movimientos-heading">
+                    <div>
+                        <h2>Consulta de suscripciones</h2>
+                        <p>Socio, plan, vigencia, total y condición</p>
+                    </div>
+                    <span class="movimientos-count">4 resultados</span>
+                </div>
+
+                <!-- BUSCADOR -->
+                <div class="productos-toolbar">
+
+                    <label class="busqueda-fecha">
+                        <i class="fa-solid fa-calendar"></i> Desde
+                        <input type="date" aria-label="Desde" />
+                    </label>
+
+                    <label class="busqueda-fecha">
+                        <i class="fa-solid fa-calendar-check"></i> Hasta
+                        <input type="date" aria-label="Hasta" />
+                    </label>
+
+                    <label class="busqueda-productos">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="search"
+                               placeholder="Buscar por N° registro, socio o membresía..."
+                               aria-label="Buscar suscripciones" />
+                    </label>
+
+                    <button type="button" class="catalogo-buscar">Buscar</button>
+                    <button type="button" class="catalogo-limpiar">Limpiar</button>
+
+                </div>
+
+                <!-- TABLA -->
+                <div class="tabla-scroll" data-paginar="suscripciones">
+
+                    <table class="tabla-movimientos tabla-productos catalogo-tabla planes-tabla">
+
+                        <thead>
+                            <tr>
+                                <th>N° registro</th>
+                                <th>Socio</th>
+                                <th>Membresía</th>
+                                <th>Inicio</th>
+                                <th>Vencimiento</th>
+                                <th>Vigente</th>
+                                <th>Total</th>
+                                <th>Condición</th>
+                                <th>Vendedor</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td><strong class="plan-codigo">00000116</strong></td>
+                                <td>
+                                    <strong>JUAN PÉREZ RAMOS</strong>
+                                    <small class="socio-doc">70012717</small>
+                                </td>
+                                <td>PLAN BÁSICO</td>
+                                <td>13/11/2026</td>
+                                <td>12/12/2026</td>
+                                <td><span class="vigente-si">SI</span></td>
+                                <td><strong>S/ 99.00</strong></td>
+                                <td>ACTIVA</td>
+                                <td>ADMIN SISTEMA</td>
+                                <td class="acciones">
+                                    <h:link outcome="/membresias.xhtml" styleClass="accion-btn editar-btn" title="Ver / modificar">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </h:link>
+                                    <button type="button" class="accion-btn eliminar-btn" title="Eliminar"
+                                            onclick="return confirm('¿Eliminar esta suscripción?');">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong class="plan-codigo">00000115</strong></td>
+                                <td>
+                                    <strong>MARÍA LÓPEZ DÍAZ</strong>
+                                    <small class="socio-doc">45879632</small>
+                                </td>
+                                <td>PLAN TRIMESTRAL</td>
+                                <td>01/11/2026</td>
+                                <td>31/01/2027</td>
+                                <td><span class="vigente-si">SI</span></td>
+                                <td><strong>S/ 249.00</strong></td>
+                                <td>ACTIVA</td>
+                                <td>ADMIN SISTEMA</td>
+                                <td class="acciones">
+                                    <h:link outcome="/membresias.xhtml" styleClass="accion-btn editar-btn" title="Ver / modificar">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </h:link>
+                                    <button type="button" class="accion-btn eliminar-btn" title="Eliminar"
+                                            onclick="return confirm('¿Eliminar esta suscripción?');">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong class="plan-codigo">00000114</strong></td>
+                                <td>
+                                    <strong>CARLOS TORRES VEGA</strong>
+                                    <small class="socio-doc">41236587</small>
+                                </td>
+                                <td>PLAN ANUAL</td>
+                                <td>15/10/2026</td>
+                                <td>14/10/2027</td>
+                                <td><span class="vigente-si">SI</span></td>
+                                <td><strong>S/ 799.00</strong></td>
+                                <td>ACTIVA</td>
+                                <td>INDIRA</td>
+                                <td class="acciones">
+                                    <h:link outcome="/membresias.xhtml" styleClass="accion-btn editar-btn" title="Ver / modificar">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </h:link>
+                                    <button type="button" class="accion-btn eliminar-btn" title="Eliminar"
+                                            onclick="return confirm('¿Eliminar esta suscripción?');">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong class="plan-codigo">00000113</strong></td>
+                                <td>
+                                    <strong>ANA SALAZAR QUISPE</strong>
+                                    <small class="socio-doc">70011223</small>
+                                </td>
+                                <td>PLAN TRIMESTRAL</td>
+                                <td>01/06/2026</td>
+                                <td>31/08/2026</td>
+                                <td><span class="vigente-no">NO</span></td>
+                                <td><strong>S/ 249.00</strong></td>
+                                <td>VENCIDA</td>
+                                <td>ALBERTO</td>
+                                <td class="acciones">
+                                    <h:link outcome="/membresias.xhtml" styleClass="accion-btn editar-btn" title="Ver / modificar">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </h:link>
+                                    <button type="button" class="accion-btn eliminar-btn" title="Eliminar"
+                                            onclick="return confirm('¿Eliminar esta suscripción?');">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </ui:define>
+
+</ui:composition>

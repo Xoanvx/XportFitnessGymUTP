@@ -1,29 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
     xmlns:ui="jakarta.faces.facelets" xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core"
+    xmlns:pt="jakarta.faces.passthrough"
     xmlns:app="jakarta.faces.composite/components" template="/WEB-INF/templates/principal.xhtml">
     <ui:param name="menuOpcion" value="nuevoProducto" />
     <ui:param name="menuSubmenu" value="catalogo" />
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewAction action="#{productoBean.prepararFormulario}" />
+        </f:metadata>
+    </ui:define>
     <ui:define name="title">Registro de Productos | Xport Fitness Gym</ui:define>
     <ui:define name="styles">
 <link rel="stylesheet"
           href="#{request.contextPath}/css/socios.css" />
-    
-    
-    
-    
-    <style><![CDATA[
+    <style>
         /* Espaciado general del formulario de productos */
         #formProductos {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 26px;
+        }
+
+        /* Más aire en el panel y entre el formulario y la foto */
+        .panel-productos {
+            padding: 34px 40px;
+        }
+
+        .panel-productos .contenido-form {
+            gap: 48px;
+        }
+
+        .panel-productos .titulo-modulo {
+            margin-bottom: 26px;
+        }
+
+        /* Subtítulos de cada bloque de campos */
+        #formProductos .grupo-titulo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 18px 0 -2px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #E6EBF3;
+            color: #2864F0;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .6px;
+            text-transform: uppercase;
+        }
+
+        #formProductos .grupo-titulo:first-child {
+            margin-top: 0;
         }
 
         /* Separación entre columnas del mismo renglón */
         #formProductos .fila {
             display: grid;
-            gap: 18px;
+            gap: 26px 32px;
             margin: 0;
         }
 
@@ -39,24 +73,46 @@
         #formProductos .campo {
             display: flex;
             flex-direction: column;
-            gap: 7px;
+            gap: 10px;
             min-width: 0;
             margin: 0;
         }
 
         #formProductos .campo label {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 6px;
             line-height: 1.4;
             margin: 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: #17233C;
+        }
+
+        #formProductos .campo label i {
+            color: #2864F0;
+            font-size: 12px;
         }
 
         /* Altura y comodidad de los controles */
         #formProductos input,
         #formProductos select {
             width: 100%;
-            min-height: 39px;
-            padding: 9px 12px;
+            min-height: 42px;
+            padding: 10px 14px;
             border-radius: 8px;
+        }
+
+        /* Campos calculados o bloqueados */
+        #formProductos input[readonly],
+        #formProductos input:disabled {
+            background: #F0F3F8;
+            color: #475569;
+        }
+
+        #formProductos .ayuda-campo {
+            font-size: 11px;
+            color: #7B8798;
         }
 
         /* Evitar que los campos completos se reduzcan */
@@ -68,68 +124,161 @@
         @media (max-width: 700px) {
             #formProductos .fila,
             #formProductos .fila-tres {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
+            }
+
+            .panel-productos {
+                padding: 18px;
+            }
+
+            .panel-productos .contenido-form {
+                gap: 24px;
             }
         }
-        
-         .seccion-titulo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 24px;
-            margin-bottom: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            color: #10234D;
+
+        /* Nuevo, Grabar, Actualizar y Salir en una sola fila horizontal */
+        .botones-productos {
+            margin-top: 38px;
+            margin-bottom: 4px;
+            padding-top: 28px;
+            gap: 18px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
         }
 
-        .botones-productos {
-            margin-bottom: 20px;
+        .botones-productos .btn-form {
+            min-height: 44px;
         }
-    ]]></style>
+
+        .botones-productos .btn-form {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        /* Un commandLink deshabilitado se dibuja como SPAN */
+        .botones-productos span.btn-form {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 620px) {
+            .botones-productos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        .foto-producto-avatar {
+            border-radius: 12px !important;
+            background-color: #f1f5f9 !important;
+            border: 2px dashed #cbd5e1 !important;
+            color: #94a3b8;
+        }
+
+        .mensajes-productos {
+            list-style: none;
+            margin: 0 0 16px;
+            padding: 0;
+            font-size: 13px;
+        }
+
+        .mensajes-productos li {
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+
+        .mensajes-productos .msj-info { background: #ECFDF3; color: #067647; border: 1px solid #A6E3BD; }
+        .mensajes-productos .msj-error { background: #FFF1F1; color: #B42318; border: 1px solid #F3B4B4; }
+
+        .aviso-edicion {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin: 0 0 16px;
+            padding: 10px 12px;
+            border: 1px solid #C7D7FE;
+            border-radius: 8px;
+            background: #EAF0FF;
+            color: #10234D;
+            font-size: 13px;
+        }
+
+        .aviso-edicion i { color: #2864F0; }
+    </style>
     </ui:define>
     <ui:define name="content">
 <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
-        <section class="panel">
+        <section class="panel panel-productos">
 
             <div class="titulo-modulo">
                 <i class="fa-solid fa-box-open"></i>
                 <h1>Registro de Productos</h1>
             </div>
 
+            <h:messages globalOnly="true" layout="list" styleClass="mensajes-productos"
+                        infoClass="msj-info" errorClass="msj-error" />
+
+            <h:panelGroup layout="block" styleClass="aviso-edicion" rendered="#{productoBean.edicion}">
+                <i class="fa-solid fa-pen-to-square"></i>
+                Editando el producto <strong>#{productoBean.producto.producto_ID}</strong>
+                — #{productoBean.producto.nombreProducto}.
+                Pulse <strong>Nuevo (F2)</strong> para registrar otro producto.
+            </h:panelGroup>
+
+            <h:form id="frmProducto" prependId="false">
+
             <!-- FORMULARIO Y FOTO -->
             <div class="contenido-form">
 
-                <form class="form-socios" id="formProductos"
-                      onsubmit="return false;">
+                <div class="form-socios" id="formProductos">
 
-                    <!-- CODIGO Y CATEGORIA -->
-                    <div class="fila">
+                    <div class="grupo-titulo"><i class="fa-solid fa-circle-info"></i> Datos generales</div>
+
+                    <!-- CODIGO, ESTADO Y TIPO -->
+                    <div class="fila fila-tres">
                         <div class="campo">
                             <label for="codigoProducto">
-                                <i class="fa-solid fa-barcode"></i>
-                                Código / Barras
+                                <i class="fa-solid fa-hashtag"></i>
+                                Código
                             </label>
-                            <input type="text"
-                                   id="codigoProducto"
-                                   name="codigoProducto"
-                                   placeholder="PROD-001" />
+                            <h:inputText id="codigoProducto" value="#{productoBean.producto.producto_ID}"
+                                         readonly="true" pt:title="Se genera automáticamente" />
                         </div>
 
                         <div class="campo">
-                            <label for="categoriaProducto">
-                                <i class="fa-solid fa-tags"></i>
-                                Categoría
+                            <label for="estadoProducto">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Estado
                             </label>
-                            <select id="categoriaProducto"
-                                    name="categoriaProducto">
-                                <option value="Suplementos">Suplementos</option>
-                                <option value="Ropa Deportiva">Ropa Deportiva</option>
-                                <option value="Accesorios">Accesorios</option>
-                                <option value="Bebidas">Bebidas</option>
-                            </select>
+                            <h:selectOneMenu id="estadoProducto" value="#{productoBean.producto.estadoProducto}">
+                                <f:selectItem itemLabel="Activo" itemValue="Activo" />
+                                <f:selectItem itemLabel="Inactivo" itemValue="Inactivo" />
+                            </h:selectOneMenu>
                         </div>
+
+                        <div class="campo">
+                            <label for="tipoProducto">
+                                <i class="fa-solid fa-shapes"></i>
+                                Tipo de producto
+                            </label>
+                            <h:selectOneMenu id="tipoProducto" value="#{productoBean.producto.tipoProd}">
+                                <f:selectItem itemLabel="VENTA" itemValue="V" />
+                                <f:selectItem itemLabel="SERVICIO" itemValue="S" />
+                            </h:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <!-- DESCRIPCION -->
+                    <div class="campo campo-full">
+                        <label for="descripcionProducto">
+                            <i class="fa-solid fa-align-left"></i>
+                            Descripción
+                        </label>
+                        <h:inputText id="descripcionProducto" value="#{productoBean.producto.descripcion}"
+                                     maxlength="100" pt:placeholder="Ej. Proteína Whey 2lb Chocolate" />
                     </div>
 
                     <!-- NOMBRE -->
@@ -138,37 +287,96 @@
                             <i class="fa-solid fa-box"></i>
                             Nombre del Producto
                         </label>
-                        <input type="text"
-                               id="nombreProducto"
-                               name="nombreProducto"
-                               placeholder="Ej. Proteína Whey 2lb Chocolate" />
+                        <h:inputText id="nombreProducto" value="#{productoBean.producto.nombreProducto}"
+                                     maxlength="50" pt:placeholder="Si lo deja vacío se usa la descripción" />
                     </div>
 
-                    <!-- DESCRIPCION -->
-                    <div class="campo campo-full">
-                        <label for="descripcionProducto">
-                            <i class="fa-solid fa-align-left"></i>
-                            Descripción corta
-                        </label>
-                        <input type="text"
-                               id="descripcionProducto"
-                               name="descripcionProducto"
-                               placeholder="Ej. 24g de proteína por porción..." />
+                    <div class="grupo-titulo"><i class="fa-solid fa-layer-group"></i> Clasificación</div>
+
+                    <!-- CATEGORIA Y MARCA -->
+                    <div class="fila">
+                        <div class="campo">
+                            <label for="categoriaProducto">
+                                <i class="fa-solid fa-tags"></i>
+                                Categoría de Producto
+                            </label>
+                            <h:selectOneMenu id="categoriaProducto" value="#{productoBean.producto.categoria_ID}">
+                                <f:selectItem itemLabel="-- Seleccione --" itemValue="0" />
+                                <f:selectItems value="#{productoBean.listaCategorias}" var="c"
+                                               itemValue="#{c.categoria_ID}" itemLabel="#{c.nombre}" />
+                            </h:selectOneMenu>
+                        </div>
+
+                        <div class="campo">
+                            <label for="marcaProducto">
+                                <i class="fa-solid fa-copyright"></i>
+                                Marca de Producto
+                            </label>
+                            <h:selectOneMenu id="marcaProducto" value="#{productoBean.producto.marcaProducto_ID}">
+                                <f:selectItem itemLabel="-- Seleccione --" itemValue="0" />
+                                <f:selectItems value="#{productoBean.listaMarcas}" var="m"
+                                               itemValue="#{m.marca_ID}" itemLabel="#{m.nombre}" />
+                            </h:selectOneMenu>
+                        </div>
                     </div>
 
-                    <!-- PRECIOS Y STOCK -->
+                    <!-- UNIDAD, CODIGO DE BARRA Y PESO -->
                     <div class="fila fila-tres">
+                        <div class="campo">
+                            <label for="unidadMedida">
+                                <i class="fa-solid fa-ruler"></i>
+                                U. Medida
+                            </label>
+                            <h:selectOneMenu id="unidadMedida" value="#{productoBean.producto.unidadMedida}">
+                                <f:selectItem itemLabel="UND" itemValue="UND" />
+                                <f:selectItem itemLabel="PQT" itemValue="PQT" />
+                            </h:selectOneMenu>
+                        </div>
+
+                        <div class="campo">
+                            <label for="codigoBarra">
+                                <i class="fa-solid fa-barcode"></i>
+                                Código de Barra
+                            </label>
+                            <h:inputText id="codigoBarra" value="#{productoBean.producto.codigoBarra}"
+                                         maxlength="50" pt:placeholder="Escanee o escriba (Insert)" />
+                        </div>
+
+                        <div class="campo">
+                            <label for="pesoProducto">
+                                <i class="fa-solid fa-weight-hanging"></i>
+                                Peso
+                            </label>
+                            <h:inputText id="pesoProducto" value="#{productoBean.producto.peso}"
+                                         pt:type="number" pt:min="0" pt:step="0.01" />
+                        </div>
+                    </div>
+
+                    <div class="grupo-titulo"><i class="fa-solid fa-coins"></i> Stock y precios</div>
+
+                    <!-- STOCK Y PRECIOS -->
+                    <div class="fila fila-tres">
+                        <div class="campo">
+                            <label for="stockActual">
+                                <i class="fa-solid fa-cubes"></i>
+                                Stock Final
+                            </label>
+                            <h:inputText id="stockActual" value="#{productoBean.producto.stockFinal}"
+                                         disabled="#{not productoBean.stockEditable}"
+                                         pt:type="number" pt:min="0" pt:step="1" />
+                            <h:outputText rendered="#{not productoBean.stockEditable}" styleClass="ayuda-campo"
+                                          value="Tiene ventas: el stock no se modifica aquí." />
+                        </div>
+
                         <div class="campo">
                             <label for="precioCompra">
                                 <i class="fa-solid fa-cart-shopping"></i>
-                                Precio Compra
+                                Precio Costo
                             </label>
-                            <input type="number"
-                                   id="precioCompra"
-                                   name="precioCompra"
-                                   min="0"
-                                   step="0.01"
-                                   placeholder="0.00" />
+                            <h:inputText id="precioCompra" value="#{productoBean.producto.precioCosto}"
+                                         pt:type="number" pt:min="0" pt:step="0.01">
+                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2" groupingUsed="false" locale="en_US" />
+                            </h:inputText>
                         </div>
 
                         <div class="campo">
@@ -176,54 +384,47 @@
                                 <i class="fa-solid fa-money-bill-wave"></i>
                                 Precio Venta
                             </label>
-                            <input type="number"
-                                   id="precioVenta"
-                                   name="precioVenta"
-                                   min="0"
-                                   step="0.01"
-                                   placeholder="0.00" />
-                        </div>
-
-                        <div class="campo">
-                            <label for="stockActual">
-                                <i class="fa-solid fa-cubes"></i>
-                                Stock Actual
-                            </label>
-                            <input type="number"
-                                   id="stockActual"
-                                   name="stockActual"
-                                   min="0"
-                                   step="1"
-                                   placeholder="0" />
+                            <h:inputText id="precioVenta" value="#{productoBean.producto.precioVenta}"
+                                         pt:type="number" pt:min="0" pt:step="0.01">
+                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2" groupingUsed="false" locale="en_US" />
+                            </h:inputText>
                         </div>
                     </div>
 
-                    <!-- PROVEEDOR Y ESTADO -->
-                    <div class="fila">
+                    <!-- PRECIO LIMITE, UTILIDAD Y MARGEN -->
+                    <div class="fila fila-tres">
                         <div class="campo">
-                            <label for="proveedorProducto">
-                                <i class="fa-solid fa-truck"></i>
-                                Proveedor
+                            <label for="precioLimite">
+                                <i class="fa-solid fa-arrow-down-short-wide"></i>
+                                Precio Límite
                             </label>
-                            <input type="text"
-                                   id="proveedorProducto"
-                                   name="proveedorProducto"
-                                   placeholder="Ej. Distribuidora Fit" />
+                            <h:inputText id="precioLimite" value="#{productoBean.producto.precioLimite}"
+                                         pt:type="number" pt:min="0" pt:step="0.01">
+                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2" groupingUsed="false" locale="en_US" />
+                            </h:inputText>
                         </div>
 
                         <div class="campo">
-                            <label for="estadoProducto">
-                                <i class="fa-solid fa-circle-check"></i>
-                                Estado
+                            <label for="utilidadProducto">
+                                <i class="fa-solid fa-coins"></i>
+                                Utilidad (S/)
                             </label>
-                            <select id="estadoProducto" name="estadoProducto">
-                                <option value="ACTIVO">ACTIVO (En venta)</option>
-                                <option value="INACTIVO">INACTIVO (Agotado)</option>
-                            </select>
+                            <input type="text" id="utilidadProducto" readonly="readonly"
+                                   value="#{productoBean.producto.utilidad}" />
+                        </div>
+
+                        <div class="campo">
+                            <label for="margenProducto">
+                                <i class="fa-solid fa-percent"></i>
+                                Margen
+                            </label>
+                            <input type="text" id="margenProducto" readonly="readonly"
+                                   value="#{productoBean.producto.margenUtil}" />
                         </div>
                     </div>
 
-                </form>
+                    <h:inputHidden id="imagenNombre" value="#{productoBean.producto.imagen}" />
+                </div>
 
                 <!-- FOTO DEL PRODUCTO -->
                 <aside class="foto-card">
@@ -247,137 +448,37 @@
                         Subir Imagen
                     </button>
 
-                    <p class="foto-ayuda">
-                        Selecciona una imagen del producto.
+                    <p class="foto-ayuda" id="nombreImagen">
+                        #{empty productoBean.producto.imagen ? 'Selecciona una imagen del producto.' : productoBean.producto.imagen}
                     </p>
                 </aside>
 
             </div>
 
             <!-- BOTONES -->
+            <!-- Los cuatro botones en una sola fila: Nuevo, Grabar, Actualizar, Salir -->
             <div class="botones-form botones-productos">
-                <button type="button" class="btn-form btn-nuevo"
-                        id="btnNuevoProducto">
-                    <i class="fa-solid fa-plus"></i>
-                    Nuevo (F2)
-                </button>
+                <h:commandLink id="btnNuevoProducto" action="#{productoBean.nuevo}" styleClass="btn-form btn-nuevo">
+                    <i class="fa-solid fa-plus"></i>&#160;Nuevo (F2)
+                </h:commandLink>
 
-                <button type="button" class="btn-form btn-grabar"
-                        id="btnGrabarProducto">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    Grabar (F3)
-                </button>
+                <h:commandLink id="btnGrabarProducto" action="#{productoBean.grabar}"
+                               styleClass="btn-form btn-grabar" disabled="#{productoBean.edicion}">
+                    <i class="fa-solid fa-floppy-disk"></i>&#160;Grabar (F3)
+                </h:commandLink>
 
-                <button type="button" class="btn-form btn-actualizar"
-                        id="btnActualizarProducto">
-                    <i class="fa-solid fa-rotate"></i>
-                    Actualizar (F4)
-                </button>
+                <h:commandLink id="btnActualizarProducto" action="#{productoBean.actualizar}"
+                               styleClass="btn-form btn-actualizar" disabled="#{not productoBean.edicion}">
+                    <i class="fa-solid fa-rotate"></i>&#160;Actualizar (F4)
+                </h:commandLink>
 
-                <button type="button" class="btn-form btn-salir"
-                        id="btnSalirProducto">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    Salir (Esc)
-                </button>
+                <h:commandLink id="btnSalirProducto" action="#{productoBean.salir}" immediate="true"
+                               styleClass="btn-form btn-salir">
+                    <i class="fa-solid fa-right-from-bracket"></i>&#160;Salir (Esc)
+                </h:commandLink>
             </div>
 
-            <!-- LISTADO DE EJEMPLO -->
-            <div class="seccion-titulo">
-                <i class="fa-solid fa-list"></i>
-                Lista de Productos
-            </div>
-
-            <div class="tabla-contenedor tabla-productos-registro">
-                <table class="tabla">
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Producto</th>
-                            <th>Categoría</th>
-                            <th>P. Venta</th>
-                            <th>Stock</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr>
-                            <td>PROD-001</td>
-                            <td>Proteína Whey 2lb</td>
-                            <td>Suplementos</td>
-                            <td>S/ 120.00</td>
-                            <td>15</td>
-                            <td><span class="punto verde"></span> Activo</td>
-                            <td>
-                                <button type="button" class="btn-accion btn-oscuro"
-                                        title="Editar">
-                                    <i class="fa-solid fa-pen"></i>
-                                </button>
-                                <button type="button" class="btn-accion btn-verde"
-                                        title="Reponer">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                </button>
-                                <button type="button" class="btn-accion btn-rojo"
-                                        title="Eliminar">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>PROD-002</td>
-                            <td>Shaker Xport</td>
-                            <td>Accesorios</td>
-                            <td>S/ 25.00</td>
-                            <td>40</td>
-                            <td><span class="punto verde"></span> Activo</td>
-                            <td>
-                                <button type="button" class="btn-accion btn-oscuro"
-                                        title="Editar">
-                                    <i class="fa-solid fa-pen"></i>
-                                </button>
-                                <button type="button" class="btn-accion btn-verde"
-                                        title="Reponer">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                </button>
-                                <button type="button" class="btn-accion btn-rojo"
-                                        title="Eliminar">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>PROD-003</td>
-                            <td>Polera Oversize Negra</td>
-                            <td>Ropa Deportiva</td>
-                            <td>S/ 65.00</td>
-                            <td>0</td>
-                            <td><span class="punto rojo"></span> Agotado</td>
-                            <td>
-                                <button type="button" class="btn-accion btn-oscuro"
-                                        title="Editar">
-                                    <i class="fa-solid fa-pen"></i>
-                                </button>
-                                <button type="button" class="btn-accion btn-verde"
-                                        title="Reponer">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                </button>
-                                <button type="button" class="btn-accion btn-rojo"
-                                        title="Eliminar">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <p class="nota-demo nota-productos">
-                <i class="fa-solid fa-circle-info"></i>
-                Los productos de esta tabla son datos de muestra.
-            </p>
+            </h:form>
 
         </section>
     </main>
@@ -387,143 +488,120 @@
 document.addEventListener("DOMContentLoaded", function () {
     "use strict";
 
-    const contexto = '#{request.contextPath}';
-
     const inputImagen = document.getElementById("imagenProducto");
     const botonImagen = document.getElementById("btnSubirImagen");
     const avatar = document.getElementById("fotoProductoAvatar");
-    const formulario = document.getElementById("formProductos");
+    const nombreImagen = document.getElementById("nombreImagen");
+    const imagenOculta = document.getElementById("imagenNombre");
 
-    const botonNuevo = document.getElementById("btnNuevoProducto");
-    const botonSalir = document.getElementById("btnSalirProducto");
-    const botonGrabar = document.getElementById("btnGrabarProducto");
-    const botonActualizar = document.getElementById("btnActualizarProducto");
+    const descripcion = document.getElementById("descripcionProducto");
+    const nombre = document.getElementById("nombreProducto");
+    const costo = document.getElementById("precioCompra");
+    const venta = document.getElementById("precioVenta");
+    const utilidad = document.getElementById("utilidadProducto");
+    const margen = document.getElementById("margenProducto");
+    const codigoBarra = document.getElementById("codigoBarra");
 
-    // Verificar que los elementos principales existan.
-    if (!inputImagen || !botonImagen || !avatar || !formulario) {
-        console.error(
-            "No se encontraron todos los elementos del formulario de productos."
-        );
-        return;
+    function numero(campo) {
+        const v = parseFloat(campo ? campo.value : "");
+        return isNaN(v) ? 0 : v;
     }
 
-    // Abrir el selector de archivos.
-    botonImagen.addEventListener("click", function () {
-        inputImagen.click();
-    });
-
-    // Vista previa de la imagen seleccionada.
-    inputImagen.addEventListener("change", function () {
-        const archivo = inputImagen.files[0];
-
-        if (!archivo) {
-            return;
-        }
-
-        if (!archivo.type.startsWith("image/")) {
-            alert("Selecciona un archivo de imagen válido.");
-            inputImagen.value = "";
-            return;
-        }
-
-        const lector = new FileReader();
-
-        lector.onload = function (evento) {
-            avatar.replaceChildren();
-
-            avatar.style.backgroundImage =
-                "url('" + evento.target.result + "')";
-
-            avatar.style.backgroundSize = "contain";
-            avatar.style.backgroundPosition = "center";
-            avatar.style.backgroundRepeat = "no-repeat";
-        };
-
-        lector.onerror = function () {
-            alert("No se pudo cargar la imagen seleccionada.");
-            inputImagen.value = "";
-        };
-
-        lector.readAsDataURL(archivo);
-    });
-
-    // Restablecer la vista previa de la imagen.
-    function restablecerImagen() {
-        avatar.replaceChildren();
-
-        const icono = document.createElement("i");
-        icono.className = "fa-solid fa-image";
-
-        avatar.appendChild(icono);
-        avatar.style.backgroundImage = "none";
-        avatar.style.backgroundSize = "";
-        avatar.style.backgroundPosition = "";
-        avatar.style.backgroundRepeat = "";
+    // Utilidad = PrecioVenta - PrecioCosto; Margen % = (PrecioVenta / PrecioCosto - 1) * 100 (CalculoUtilidad de frm_Productos)
+    function calcularUtilidad() {
+        if (!costo || !venta) return;
+        const c = numero(costo);
+        const v = numero(venta);
+        utilidad.value = (v - c).toFixed(2);
+        margen.value = c > 0 ? ((v / c - 1) * 100).toFixed(2) : "0.00";
     }
 
-    // Limpiar formulario.
-    if (botonNuevo) {
-        botonNuevo.addEventListener("click", function () {
-            formulario.reset();
-            inputImagen.value = "";
-            restablecerImagen();
+    if (costo) costo.addEventListener("input", calcularUtilidad);
+    if (venta) venta.addEventListener("input", calcularUtilidad);
+    calcularUtilidad();
+
+    // Al salir de la descripción se copia al nombre si está vacío (Enter en txtdesc de frm_Productos)
+    if (descripcion) {
+        if (nombre) {
+            descripcion.addEventListener("change", function () {
+                if (nombre.value.trim() === "") nombre.value = descripcion.value.trim().substring(0, 50);
+            });
+        }
+    }
+
+    // Imagen: vista previa y se guarda el nombre del archivo (como txtimagen de frm_Productos)
+    if (botonImagen) {
+        botonImagen.addEventListener("click", function () {
+            inputImagen.click();
         });
     }
 
-    // Volver al listado de productos.
-    if (botonSalir) {
-        botonSalir.addEventListener("click", function () {
-            window.location.href = contexto + "/Productos.xhtml";
+    if (inputImagen) {
+        inputImagen.addEventListener("change", function () {
+            const archivo = inputImagen.files[0];
+            if (!archivo) return;
+
+            if (!archivo.type.startsWith("image/")) {
+                alert("Selecciona un archivo de imagen válido.");
+                inputImagen.value = "";
+                return;
+            }
+
+            if (imagenOculta) imagenOculta.value = archivo.name.substring(0, 150);
+            if (nombreImagen) nombreImagen.textContent = archivo.name;
+
+            const lector = new FileReader();
+            lector.onload = function (evento) {
+                avatar.replaceChildren();
+                avatar.style.backgroundImage = "url('" + evento.target.result + "')";
+                avatar.style.backgroundSize = "contain";
+                avatar.style.backgroundPosition = "center";
+                avatar.style.backgroundRepeat = "no-repeat";
+            };
+            lector.onerror = function () {
+                alert("No se pudo cargar la imagen seleccionada.");
+                inputImagen.value = "";
+            };
+            lector.readAsDataURL(archivo);
         });
     }
 
-    // Atajos de teclado.
+    // Los botones son enlaces; uno deshabilitado se dibuja como SPAN y no hace nada.
+    function pulsar(id) {
+        const boton = document.getElementById(id);
+        if (!boton) return false;
+        if (boton.tagName !== "A") return false;
+        boton.click();
+        return true;
+    }
+
+    // Atajos de teclado de frm_Productos
     document.addEventListener("keydown", function (evento) {
-        const etiqueta = evento.target.tagName;
+        const teclas = {
+            F2: "btnNuevoProducto",
+            F3: "btnGrabarProducto",
+            F4: "btnActualizarProducto",
+            Escape: "btnSalirProducto"
+        };
 
-        const estaEscribiendo = etiqueta === "INPUT"
-            || etiqueta === "SELECT"
-            || etiqueta === "TEXTAREA";
-
-        // Escape vuelve al listado.
-        if (evento.key === "Escape") {
-            if (botonSalir) {
+        if (evento.key === "Insert") {
+            if (codigoBarra) {
                 evento.preventDefault();
-                botonSalir.click();
+                codigoBarra.value = "";
+                codigoBarra.focus();
             }
             return;
         }
 
-        // F2 limpia el formulario cuando no se está escribiendo.
-        if (evento.key === "F2") {
-            if (!estaEscribiendo) {
-                evento.preventDefault();
-
-                if (botonNuevo) {
-                    botonNuevo.click();
-                }
-            }
+        const id = teclas[evento.key];
+        if (id) {
+            evento.preventDefault();
+            pulsar(id);
         }
     });
 
-    // Guardar producto.
-    // Pendiente de conectar con el controlador y SQL Server.
-    if (botonGrabar) {
-        botonGrabar.addEventListener("click", function () {
-            alert(
-                "El guardado de productos todavía no está conectado a la base de datos."
-            );
-        });
-    }
-
-    // Actualizar producto.
-    // Pendiente de conectar con el controlador y SQL Server.
-    if (botonActualizar) {
-        botonActualizar.addEventListener("click", function () {
-            alert(
-                "La actualización de productos todavía no está conectada a la base de datos."
-            );
-        });
+    if (descripcion) {
+        if (!document.querySelector(".mensajes-productos .msj-error")) descripcion.focus();
     }
 });
 </script>

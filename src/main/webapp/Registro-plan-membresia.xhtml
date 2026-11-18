@@ -3,10 +3,20 @@
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:ui="jakarta.faces.facelets"
     xmlns:h="jakarta.faces.html"
+    xmlns:f="jakarta.faces.core"
+    xmlns:a="jakarta.faces.passthrough"
     template="/WEB-INF/templates/principal.xhtml">
 
     <ui:param name="menuOpcion" value="registrarMembresia" />
     <ui:param name="menuSubmenu" value="membresias" />
+
+    <!-- ?codigo=XXXX carga el plan para editar; sin parámetro, plan nuevo -->
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewParam name="codigo" value="#{membresiaBean.codigoParam}" />
+            <f:viewAction action="#{membresiaBean.prepararFormulario}" />
+        </f:metadata>
+    </ui:define>
 
     <ui:define name="title">
         Registro de Plan | Xport Fitness Gym
@@ -299,7 +309,7 @@
                         MEMBRESÍAS / PLANES
                     </p>
 
-                    <h1>Registro de Planes de Membresía</h1>
+                    <h1>#{membresiaBean.edicion ? 'Modificar Plan de Membresía' : 'Registro de Planes de Membresía'}</h1>
 
                     <p class="gastos-subtitle">
                         Define la vigencia, tarifa y condiciones de acceso.
@@ -324,8 +334,16 @@
                 <h:link outcome="/membresias.xhtml"
                         styleClass="catalogo-tab">
 
-                    <i class="fa-solid fa-id-card"></i>
-                    Membresías
+                    <i class="fa-solid fa-file-signature"></i>
+                    Suscripción
+
+                </h:link>
+
+                <h:link outcome="/ListaSuscripcionesMembresia.xhtml"
+                        styleClass="catalogo-tab">
+
+                    <i class="fa-solid fa-address-book"></i>
+                    Suscripciones
 
                 </h:link>
 
@@ -339,13 +357,13 @@
 
             </nav>
 
-            <!-- FORMULARIO VISUAL -->
+            <!-- FORMULARIO -->
             <section class="contenido-card catalogo-contenido">
 
                 <div class="card-heading">
 
                     <div>
-                        <h2>Datos del plan</h2>
+                        <h2>#{membresiaBean.edicion ? 'Modificar plan' : 'Datos del plan'}</h2>
 
                         <p>
                             Los campos marcados con * son obligatorios
@@ -356,9 +374,11 @@
 
                 </div>
 
-                <div class="plan-form">
+                <h:messages globalOnly="false" layout="list" style="color:#dc2626;font-size:13px;margin:0 0 18px;" />
 
-                    <!-- CÓDIGO -->
+                <h:form id="formPlan" prependId="false" styleClass="plan-form">
+
+                    <!-- CÓDIGO (autogenerado) -->
                     <label class="catalogo-campo">
 
                         <span>
@@ -366,10 +386,13 @@
                             Código <b>*</b>
                         </span>
 
-                        <input type="text"
-                               maxlength="20"
-                               placeholder="Ej. PL-004"
-                               autocomplete="off" />
+                        <h:inputText value="#{membresiaBean.plan.codigoM}"
+                                     readonly="true"
+                                     a:autocomplete="off" />
+
+                        <small>
+                            #{membresiaBean.edicion ? 'El código no se puede modificar.' : 'Se genera automáticamente.'}
+                        </small>
 
                     </label>
 
@@ -381,9 +404,9 @@
                             Nombre <b>*</b>
                         </span>
 
-                        <input type="text"
-                               maxlength="80"
-                               placeholder="Ej. Plan Full" />
+                        <h:inputText value="#{membresiaBean.plan.nombreMembresia}"
+                                     maxlength="50"
+                                     a:placeholder="Ej. Plan Full" />
 
                     </label>
 
@@ -395,10 +418,10 @@
                             Estado
                         </span>
 
-                        <select>
-                            <option value="ACTIVO">ACTIVO</option>
-                            <option value="INACTIVO">INACTIVO</option>
-                        </select>
+                        <h:selectOneMenu value="#{membresiaBean.plan.estado}">
+                            <f:selectItem itemValue="Activo" itemLabel="ACTIVO" />
+                            <f:selectItem itemValue="Inactivo" itemLabel="INACTIVO" />
+                        </h:selectOneMenu>
 
                     </label>
 
@@ -407,15 +430,16 @@
 
                         <span>
                             <i class="fa-solid fa-repeat"></i>
-                            Frecuencia
+                            Frecuencia <b>*</b>
                         </span>
 
-                        <select>
-                            <option value="DIARIA">DIARIA</option>
-                            <option value="SEMANAL">SEMANAL</option>
-                            <option value="MENSUAL">MENSUAL</option>
-                            <option value="ILIMITADA">ILIMITADA</option>
-                        </select>
+                        <h:selectOneMenu value="#{membresiaBean.plan.IDFrecuencia}">
+                            <f:selectItem itemValue="0" itemLabel="-- Seleccione --" />
+                            <f:selectItems value="#{membresiaBean.listaFrecuencias}"
+                                           var="fr"
+                                           itemValue="#{fr.IDFrecuencia}"
+                                           itemLabel="#{fr.frecuencia}" />
+                        </h:selectOneMenu>
 
                     </label>
 
@@ -424,7 +448,7 @@
 
                         <legend>
                             <i class="fa-solid fa-hourglass-half"></i>
-                            Duración del plan
+                            Duración del plan <b style="color:#dc2626">*</b>
                         </legend>
 
                         <div class="duracion-grid">
@@ -433,9 +457,9 @@
 
                                 <span>Días</span>
 
-                                <input type="number"
-                                       min="0"
-                                       placeholder="0" />
+                                <h:inputText value="#{membresiaBean.plan.duracionDias}"
+                                             a:type="number" a:min="0" a:placeholder="0"
+                                             converterMessage="Días: ingrese un número entero." />
 
                             </label>
 
@@ -443,9 +467,9 @@
 
                                 <span>Semanas</span>
 
-                                <input type="number"
-                                       min="0"
-                                       placeholder="0" />
+                                <h:inputText value="#{membresiaBean.plan.duracionSemanas}"
+                                             a:type="number" a:min="0" a:placeholder="0"
+                                             converterMessage="Semanas: ingrese un número entero." />
 
                             </label>
 
@@ -453,9 +477,9 @@
 
                                 <span>Meses</span>
 
-                                <input type="number"
-                                       min="0"
-                                       placeholder="0" />
+                                <h:inputText value="#{membresiaBean.plan.duracionMeses}"
+                                             a:type="number" a:min="0" a:placeholder="0"
+                                             converterMessage="Meses: ingrese un número entero." />
 
                             </label>
 
@@ -463,9 +487,9 @@
 
                                 <span>Años</span>
 
-                                <input type="number"
-                                       min="0"
-                                       placeholder="0" />
+                                <h:inputText value="#{membresiaBean.plan.duracionAnios}"
+                                             a:type="number" a:min="0" a:placeholder="0"
+                                             converterMessage="Años: ingrese un número entero." />
 
                             </label>
 
@@ -481,10 +505,10 @@
                             Tarifa en soles (S/) <b>*</b>
                         </span>
 
-                        <input type="number"
-                               min="0"
-                               step="0.01"
-                               placeholder="Ej. 99.00" />
+                        <h:inputText value="#{membresiaBean.plan.tarifa}"
+                                     a:type="number" a:min="0" a:step="0.01"
+                                     a:placeholder="Ej. 99.00"
+                                     converterMessage="Tarifa: ingrese un monto válido." />
 
                     </label>
 
@@ -496,9 +520,9 @@
                             Límite de días de ingreso
                         </span>
 
-                        <input type="number"
-                               min="0"
-                               placeholder="0" />
+                        <h:inputText value="#{membresiaBean.plan.diasLimite}"
+                                     a:type="number" a:min="0" a:placeholder="0"
+                                     converterMessage="Límite de días: ingrese un número entero." />
 
                         <small>
                             0 significa sin límite adicional.
@@ -506,64 +530,29 @@
 
                     </label>
 
-                    <!-- RESTRICCIÓN DE HORARIO -->
-                    <fieldset class="duracion-field horario-field">
-
-                        <legend>
-                            <i class="fa-solid fa-clock"></i>
-                            Restricción de horario
-                            <small>(opcional)</small>
-                        </legend>
-
-                        <div class="duracion-grid horario-grid">
-
-                            <label class="catalogo-campo">
-
-                                <span>Desde</span>
-
-                                <input type="time" />
-
-                            </label>
-
-                            <label class="catalogo-campo">
-
-                                <span>Hasta</span>
-
-                                <input type="time" />
-
-                            </label>
-
-                            <p>
-                                Deja ambas horas vacías para permitir el
-                                ingreso en cualquier horario.
-                            </p>
-
-                        </div>
-
-                    </fieldset>
-
                     <!-- BOTONES -->
                     <div class="catalogo-botones">
 
-                        <button type="button"
-                                class="periodo productos-nuevo">
+                        <h:commandLink action="#{membresiaBean.guardar}"
+                                       styleClass="periodo productos-nuevo">
 
-                            <i class="fa-solid fa-plus"></i>
+                            <i class="fa-solid #{membresiaBean.edicion ? 'fa-floppy-disk' : 'fa-plus'}"></i>
 
-                            <span>Registrar plan</span>
+                            <span>#{membresiaBean.edicion ? 'Actualizar plan' : 'Registrar plan'}</span>
 
-                        </button>
+                        </h:commandLink>
 
-                        <h:link outcome="/ListaPlanesMembresia.xhtml"
-                                styleClass="catalogo-cancelar">
+                        <h:commandLink action="#{membresiaBean.cancelar}"
+                                       immediate="true"
+                                       styleClass="catalogo-cancelar">
 
                             Cancelar
 
-                        </h:link>
+                        </h:commandLink>
 
                     </div>
 
-                </div>
+                </h:form>
 
             </section>
 
