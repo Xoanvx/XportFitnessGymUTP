@@ -56,4 +56,12 @@ public class AsistenciaFACADE {
     {
         return dao.lista_Codigoclientes_Activos();
     }
-}
+
+    public String buscarSuscripcionVigenteF(String CodEmp, String Cliente_ID)
+    {
+        return dao.buscarSuscripcionVigente(CodEmp, Cliente_ID);
+    }
+    public boolean existeAsistenciaHoyF(String Cliente_ID)
+    {
+        return dao.existeAsistenciaHoy(Cliente_ID);
+    }}

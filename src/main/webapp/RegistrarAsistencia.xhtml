@@ -6,7 +6,7 @@
     Pendiente: enlazar con un bean -> AsistenciaFACADE (sp_InsertDetRegistroAsistencias, etc.).
 -->
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:ui="jakarta.faces.facelets" xmlns:h="jakarta.faces.html"
+    xmlns:ui="jakarta.faces.facelets" xmlns:h="jakarta.faces.html" xmlns:pt="jakarta.faces.passthrough"
     template="/WEB-INF/templates/principal.xhtml">
     <ui:param name="menuOpcion" value="registrarAsistencia" />
     <ui:param name="menuSubmenu" value="asistencia" />
@@ -15,7 +15,9 @@
         <link rel="stylesheet" href="#{request.contextPath}/css/registrar-asistencia.css?v=1" />
     </ui:define>
     <ui:define name="content">
-        <main class="ra-main">
+        <h:form id="formAsistencia" prependId="false">
+            <h:messages globalOnly="true" layout="list" styleClass="ra-mensajes" infoClass="ra-msg-ok" errorClass="ra-msg-error" />
+            <main class="ra-main">
             <!-- TÍTULO -->
             <header class="ra-titulo">
                 <h1><i class="fa-solid fa-user-check"></i> Control de asistencia</h1>
@@ -51,11 +53,8 @@
                                     <div class="ra-campo ra-campo-codigo">
                                         <label for="raCodigo">Código:</label>
                                         <div class="ra-codigo-fila">
-                                            <input type="text" id="raCodigo" autocomplete="off" autofocus="autofocus"
-                                                   placeholder="Código, DNI o QR" />
-                                            <button type="button" class="ra-btn ra-btn-ingresar" id="raIngresar">
-                                                <i class="fa-solid fa-right-to-bracket"></i> Ingresar [Enter]
-                                            </button>
+                                            <h:inputText id="raCodigo" value="#{asistenciaBean.codigo}" autocomplete="off" pt:autofocus="autofocus" pt:placeholder="Código, DNI o QR" />
+                                            <h:commandButton id="raIngresar" styleClass="ra-btn ra-btn-ingresar" value="Ingresar [Enter]" action="#{asistenciaBean.registrar}" />
                                         </div>
                                     </div>
                                     <p class="ra-ayuda">Escanee su QR (lector o celular), o digite su código o DNI y presione Enter.</p>
@@ -126,6 +125,7 @@
                 </aside>
             </div>
         </main>
+            </h:form>
     </ui:define>
     <ui:define name="scripts">
         <script src="#{request.contextPath}/js/registrar-asistencia.js?v=1"></script>

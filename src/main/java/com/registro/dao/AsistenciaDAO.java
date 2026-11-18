@@ -370,4 +370,49 @@ public class AsistenciaDAO {
             return null;
         }
     }
-}
+
+    // ------------------------------------------------------------------
+    // Validaciones del registro de asistencia (ingreso por codigo / DNI)
+    // ------------------------------------------------------------------
+
+    /**
+     * Devuelve el NroSuscripcion_id de la membresia VIGENTE hoy del socio
+     * (Condicion ACTIVA, no anulada y hoy entre FechaInicio y FechaFin), o null si no tiene.
+     */
+    public String buscarSuscripcionVigente(String CodEmp, String Cliente_ID) {
+        String sql = "SELECT TOP 1 NroSuscripcion_id FROM dbo.suscripciones_Membresia "
+                   + "WHERE CodEmp = ? AND Cliente_ID = ? "
+                   + "AND Estado <> 'Anulada' AND Condicion = 'ACTIVA' "
+                   + "AND CAST(GETDATE() AS DATE) BETWEEN CAST(FechaInicio AS DATE) AND CAST(FechaFin AS DATE) "
+                   + "ORDER BY FechaFin DESC";
+        try (Connection cn = ConexionBD.obtenerConexion();
+             java.sql.PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, CodEmp);
+            ps.setString(2, Cliente_ID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("NroSuscripcion_id");
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    /** true si el socio ya tiene una asistencia con FechaIngreso = hoy (en cualquiera de sus suscripciones). */
+    public boolean existeAsistenciaHoy(String Cliente_ID) {
+        String sql = "SELECT COUNT(1) FROM dbo.DetRegistroAsistencias "
+                   + "WHERE Cliente_ID = ? AND CAST(FechaIngreso AS DATE) = CAST(GETDATE() AS DATE)";
+        try (Connection cn = ConexionBD.obtenerConexion();
+             java.sql.PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, Cliente_ID);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            // ante un error de BD se asume que existe, para no duplicar registros
+            return true;
+        }
+    }}

@@ -121,20 +121,16 @@
         }).join("");
     }
 
-    function ingresar() {
+    // Normaliza la lectura (QR/DNI) y deja que el formulario JSF envie el codigo al bean (asistenciaBean.registrar)
+    function ingresar(e) {
         var cod = limpiarLectura(codigo.value);
-        if (!cod) { codigo.value = ""; codigo.focus(); return; }
-        limpiarSocio();
-        mostrar(registrarDemo(cod));
-        codigo.value = "";
-        btnIngresar.disabled = true;
-        codigo.focus();
+        if (!cod) { if (e) e.preventDefault(); codigo.value = ""; codigo.focus(); return; }
+        codigo.value = cod;
     }
 
-    btnIngresar.addEventListener("click", ingresar);
-    btnNuevo.addEventListener("click", nuevo);
+    btnIngresar.addEventListener("click", ingresar);    btnNuevo.addEventListener("click", nuevo);
     codigo.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") { e.preventDefault(); if (!btnIngresar.disabled) ingresar(); }
+        if (e.key === "Enter") { e.preventDefault(); btnIngresar.click(); }
     });
 
     // Si el lector QR escribe con el cursor en otro lugar, el texto va a la casilla del código
