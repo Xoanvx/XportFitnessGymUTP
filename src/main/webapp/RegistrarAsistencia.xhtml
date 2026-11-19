@@ -50,14 +50,37 @@
                                         </div>
                                     </div>
 
-                                    <div class="ra-campo ra-campo-codigo">
-                                        <label for="raCodigo">Código:</label>
-                                        <div class="ra-codigo-fila">
-                                            <h:inputText id="raCodigo" value="#{asistenciaBean.codigo}" autocomplete="off" pt:autofocus="autofocus" pt:placeholder="Código, DNI o QR" />
-                                            <h:commandButton id="raIngresar" styleClass="ra-btn ra-btn-ingresar" value="Ingresar [Enter]" action="#{asistenciaBean.registrar}" />
-                                        </div>
+                                    <!-- Campo manual oculto: el codigo lo inyecta la simulacion del lector biometrico -->
+                                    <div class="ra-campo ra-campo-codigo" style="display:none">
+                                        <h:inputText id="raCodigo" value="#{asistenciaBean.codigo}" autocomplete="off" />
+                                        <h:commandButton id="raIngresar" value="Ingresar" action="#{asistenciaBean.registrar}" />
                                     </div>
-                                    <p class="ra-ayuda">Escanee su QR (lector o celular), o digite su código o DNI y presione Enter.</p>
+
+                                    <!-- SIMULADOR DE LECTOR BIOMETRICO (solo para pruebas / presentacion) -->
+                                    <button type="button" id="raSimularHuella" class="ra-btn ra-btn-ingresar"
+                                            style="width:100%;padding:18px;font-size:1.2rem;display:block;margin-top:10px">
+                                        <i class="fa-solid fa-fingerprint"></i> Simular Lector Biométrico
+                                    </button>
+                                    <p class="ra-ayuda">Modo demostración: cada clic simula que un socio coloca su dedo en el lector USB.</p>
+                                    <script>
+                                        (function () {
+                                            // Codigos/DNI de socios de prueba que EXISTEN en la BD. Edite esta lista.
+                                            var SOCIOS_PRUEBA = ["40424328", "70012717", "40424340", "40424341"];
+                                            var ultimo = -1;
+                                            document.getElementById("raSimularHuella").addEventListener("click", function () {
+                                                var btn = this;
+                                                // rota la lista para no repetir el mismo socio dos veces seguidas
+                                                ultimo = (ultimo + 1) % SOCIOS_PRUEBA.length;
+                                                document.getElementById("raCodigo").value = SOCIOS_PRUEBA[ultimo];
+                                                btn.disabled = true;
+                                                btn.textContent = "Leyendo huella...";
+                                                setTimeout(function () {
+                                                    // clic programatico en el boton JSF oculto -> submit -> asistenciaBean.registrar()
+                                                    document.getElementById("raIngresar").click();
+                                                }, 700);
+                                            });
+                                        }());
+                                    </script>
 
                                     <div class="ra-bienvenida" id="raBienvenida" hidden="hidden">
                                         <span>Bienvenido(a):</span>

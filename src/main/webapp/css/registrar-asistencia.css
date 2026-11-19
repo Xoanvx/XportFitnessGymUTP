@@ -98,3 +98,9 @@
     .ra-fecha-hora{grid-template-columns:1fr}
     .ra-codigo-fila{flex-direction:column}
 }
+
+/* ---- Mensajes de asistencia (h:messages) ---- */
+.ra-mensajes{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-direction:column;gap:6px}
+.ra-mensajes li{padding:10px 14px;border-radius:8px;font-size:14px;font-weight:600;border:1px solid transparent}
+.ra-mensajes .ra-msg-ok{background:#E8F8EF;color:#167344;border-color:#B7E4C9}
+.ra-mensajes .ra-msg-error{background:#FDECEC;color:#B42318;border-color:#F4B9B3}

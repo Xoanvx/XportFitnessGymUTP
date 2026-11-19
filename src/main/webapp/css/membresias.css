@@ -96,3 +96,13 @@ html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;backgr
 @media(max-width:900px){.dashboard-container{display:block}.sidebar{width:100%;min-height:auto;padding:15px}.saludo-admin h2{margin-bottom:14px}.sidebar-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}.sidebar-menu li{margin:0}.sidebar-menu2{display:flex;gap:8px;margin-top:12px;padding-top:10px}.main-content{padding:12px}.panel{padding:17px}}
 @media(max-width:900px){.fila-socio{grid-template-columns:minmax(0,1fr) auto auto}.fila-socio>.campo:last-child{grid-column:1/-1}.barra-ayuda{margin-left:0;width:100%}}
 @media(max-width:620px){.fila,.fila-tres,.fila-codigo,.fila-membresia,.fila-socio,.fila-observacion,.resumen-pago{grid-template-columns:1fr}.barra-acciones .btn-buscar{flex:1 1 100%}.btn-buscar{width:100%}.botones-form{grid-template-columns:repeat(2,minmax(0,1fr))}.titulo-modulo h1{font-size:19px}}
+
+/* ---- Integración JSF: form externo, enlaces como botones y mensajes ---- */
+.form-externo{display:contents}
+a.btn-buscar,a.btn-form,a.selector-cerrar{display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;box-sizing:border-box}
+a.btn-form{width:100%}
+.msg-membresia{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-direction:column;gap:6px}
+.msg-membresia li{padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid transparent}
+.msg-membresia .msg-ok{background:#E8F8EF;color:#167344;border-color:#B7E4C9}
+.msg-membresia .msg-error{background:#FDECEC;color:#B42318;border-color:#F4B9B3}
+.msg-membresia .msg-aviso{background:#FFF4DB;color:#A15C07;border-color:#F3D9A0}

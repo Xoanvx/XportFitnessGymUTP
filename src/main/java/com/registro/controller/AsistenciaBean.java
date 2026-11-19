@@ -48,7 +48,7 @@ public class AsistenciaBean implements Serializable {
             cliente = clientes().ListaClienteXRucDni(cod);
         }
         if (cliente == null) {
-            error("No existe el socio con este cÃ³digo");
+            error("No existe el socio con este código");
             return limpiar();
         }
         String clienteId = cliente.getCliente_ID();
@@ -56,13 +56,13 @@ public class AsistenciaBean implements Serializable {
         // 2) Membresia registrada y vigente hoy
         String nroSuscripcion = asistencias().buscarSuscripcionVigenteF(MembresiaBean.codEmpSesion(), clienteId);
         if (nroSuscripcion == null) {
-            error("No existe el socio como membresÃ­a registrada");
+            error("No existe el socio como membresía registrada");
             return limpiar();
         }
 
         // 3) No repetir asistencia el mismo dia
         if (asistencias().existeAsistenciaHoyF(clienteId)) {
-            error("Ya registrÃ³ su asistencia hoy, no puede repetir");
+            error("Ya registró su asistencia hoy, no puede repetir");
             return limpiar();
         }
 

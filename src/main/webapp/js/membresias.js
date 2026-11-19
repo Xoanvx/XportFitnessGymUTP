@@ -1,22 +1,14 @@
 /*
- * Suscripción de membresía (estructura de SisdataGimnasio/frm_RegistroMembresia).
- * Comportamiento solo de interfaz: selector de planes, fechas, descuento/total y atajos.
- * Registrar, buscar socio, comprobante e impresión se conectarán al controlador.
+ * Suscripción de membresía (frm_RegistroMembresia).
+ * La lógica (nuevo, planes, buscar socio, registrar, eliminar, totales y fechas) vive en
+ * suscripcionMembresiaBean; este script solo conecta los atajos de teclado con los botones JSF.
  */
 document.addEventListener("DOMContentLoaded", function () {
     const $ = function (id) { return document.getElementById(id); };
-    const form = $("formMembresia");
-    const selector = $("selectorPlanes");
 
-    function hoyISO() {
-        const d = new Date();
-        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-        return d.toISOString().slice(0, 10);
-    }
-
-    function dinero(valor) {
-        const n = parseFloat(valor);
-        return isNaN(n) ? "0.00" : n.toFixed(2);
+    function clic(id) {
+        const el = $(id);
+        if (el) el.click();
     }
 
     function irDashboard() {
@@ -25,127 +17,59 @@ document.addEventListener("DOMContentLoaded", function () {
         else window.history.back();
     }
 
-    function aviso(texto) { alert(texto); }
-
-    // ---------- Totales ----------
-    function recalcularTotal() {
-        const subtotal = parseFloat($("subtotal").value) || 0;
-        let descuento = $("aplicarDescuento").checked ? (parseFloat($("descuento").value) || 0) : 0;
-        if (descuento < 0) descuento = 0;
-        if (descuento > subtotal) descuento = subtotal;
-        $("total").value = dinero(subtotal - descuento);
-    }
-
-    $("aplicarDescuento").addEventListener("change", function () {
-        $("descuento").disabled = !this.checked;
-        if (!this.checked) $("descuento").value = "0.00";
-        else $("descuento").focus();
-        recalcularTotal();
-    });
-    $("descuento").addEventListener("input", recalcularTotal);
-    $("descuento").addEventListener("blur", function () { this.value = dinero(this.value); recalcularTotal(); });
-
-    // ---------- Fechas ----------
-    let mesesPlan = 0;
-    function calcularVencimiento() {
-        const inicio = $("fechaInicio").value;
-        if (!inicio || !mesesPlan) return;
-        const f = new Date(inicio + "T00:00:00");
-        f.setMonth(f.getMonth() + mesesPlan);
-        f.setMinutes(f.getMinutes() - f.getTimezoneOffset());
-        $("fechaVencimiento").value = f.toISOString().slice(0, 10);
-    }
-    $("fechaInicio").addEventListener("change", calcularVencimiento);
-
-    // ---------- Selector de planes [F5] ----------
-    function mostrarPlanes() {
-        selector.hidden = !selector.hidden;
-        if (!selector.hidden) selector.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-    $("btnVerMembresias").addEventListener("click", mostrarPlanes);
-    $("btnCerrarPlanes").addEventListener("click", function () { selector.hidden = true; });
-
-    selector.querySelectorAll("tbody tr").forEach(function (fila) {
-        fila.addEventListener("click", function () {
-            selector.querySelectorAll("tbody tr").forEach(function (f) { f.classList.remove("seleccionado"); });
-            fila.classList.add("seleccionado");
-
-            const d = fila.dataset;
-            $("codMembresia").value = d.codigo;
-            $("nombreMembresia").value = d.nombre;
-            $("diasLimite").value = d.limite;
-            $("tarifa").value = dinero(d.tarifa);
-            $("duracion").value = d.duracion;
-            $("frecuencia").value = d.frecuencia;
-            $("subtotal").value = dinero(d.tarifa);
-            mesesPlan = parseInt(d.meses, 10) || 0;
-            if (!$("fechaInicio").value) $("fechaInicio").value = hoyISO();
-            calcularVencimiento();
-            recalcularTotal();
-            selector.hidden = true;
-        });
-    });
-
-    // ---------- Botones ----------
-    function nuevo() {
-        form.reset();
-        selector.hidden = true;
-        mesesPlan = 0;
-        $("descuento").disabled = true;
-        $("fechaInicio").value = hoyISO();
-        $("condicion").value = "ACTIVA";
-        $("lblEstado").textContent = "Pendiente";
-        $("lblEstado").className = "estado-badge estado-pendiente";
-        recalcularTotal();
-        $("codigo").focus();
-    }
-
-    function buscarSocio() {
-        $("codigo").focus();
-        aviso("La búsqueda de socios se conectará cuando implementemos la acción en el controlador.");
-    }
-
-    function registrar() {
-        if (!$("codigo").value.trim()) { aviso("Ingrese o busque el socio [F6]."); $("codigo").focus(); return; }
-        if (!$("codMembresia").value.trim()) { aviso("Seleccione la membresía con Ver membresías [F5]."); return; }
-        aviso("El registro de la suscripción se implementará al conectar el formulario con la base de datos.");
-    }
-
-    $("btnNuevo").addEventListener("click", nuevo);
-    $("btnRegistrar").addEventListener("click", registrar);
-    $("btnBuscar").addEventListener("click", buscarSocio);
-    $("btnNuevoSocio").addEventListener("click", function () {
+    function irSocios() {
         const enlace = document.querySelector('.sidebar a[href*="socios"]');
         if (enlace) window.location.href = enlace.href;
-        else aviso("Registre el socio desde el módulo Socios.");
+        else window.location.href = "socios.xhtml";
+    }
+
+    function aviso(texto) { alert(texto); }
+
+    // ---------- Selector de planes: clic en la fila = clic en su enlace JSF ----------
+    document.addEventListener("click", function (e) {
+        const fila = e.target.closest(".tabla-planes tbody tr");
+        if (!fila || e.target.closest("a")) return;
+        const enlace = fila.querySelector("a");
+        if (enlace) enlace.click();
     });
-    $("btnRenovar").addEventListener("click", function () {
+
+    // ---------- Botones sin conexión todavía (plantilla) ----------
+    const nuevoSocio = $("btnNuevoSocio");
+    if (nuevoSocio) nuevoSocio.addEventListener("click", irSocios);
+    const salir = $("btnSalir");
+    if (salir) salir.addEventListener("click", irDashboard);
+    const renovar = $("btnRenovar");
+    if (renovar) renovar.addEventListener("click", function () {
         aviso("La renovación tomará la última membresía terminada del socio al conectar con la base de datos.");
     });
-    $("btnEliminar").addEventListener("click", function () {
-        if (confirm("¿Eliminar la suscripción " + $("nroRegistro").value + "?")) {
-            aviso("La eliminación se implementará al conectar el formulario con la base de datos.");
-        }
-    });
-    $("btnComprobante").addEventListener("click", function () {
+    const comprobante = $("btnComprobante");
+    if (comprobante) comprobante.addEventListener("click", function () {
         aviso("La generación del comprobante se implementará al conectar con la base de datos.");
     });
-    $("btnImprimir").addEventListener("click", function () {
+    const imprimir = $("btnImprimir");
+    if (imprimir) imprimir.addEventListener("click", function () {
         aviso("La impresión de la suscripción se implementará al conectar con la base de datos.");
     });
-    $("btnSalir").addEventListener("click", irDashboard);
 
-    // ---------- Atajos de teclado (como en el formulario de escritorio) ----------
+    // Enter en el código del socio = Buscar [F6]
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && e.target && e.target.id === "codigo") {
+            e.preventDefault();
+            clic("btnBuscar");
+        }
+    });
+
+    // ---------- Atajos de teclado (disparan los botones JSF reales) ----------
     document.addEventListener("keydown", function (event) {
         const acciones = {
-            "F2": nuevo,
-            "F3": registrar,
-            "F4": function () { $("btnComprobante").click(); },
-            "F5": mostrarPlanes,
-            "F6": buscarSocio,
-            "F7": function () { $("btnNuevoSocio").click(); },
-            "Pause": function () { $("btnImprimir").click(); },
-            "Escape": function () { if (!selector.hidden) selector.hidden = true; else irDashboard(); }
+            "F2": function () { clic("btnNuevo"); },
+            "F3": function () { clic("btnRegistrar"); },
+            "F4": function () { clic("btnComprobante"); },
+            "F5": function () { clic("btnVerMembresias"); },
+            "F6": function () { clic("btnBuscar"); },
+            "F7": function () { clic("btnNuevoSocio"); },
+            "Pause": function () { clic("btnImprimir"); },
+            "Escape": function () { if ($("btnCerrarPlanes")) clic("btnCerrarPlanes"); else irDashboard(); }
         };
         const accion = acciones[event.key];
         if (accion) {
@@ -153,8 +77,4 @@ document.addEventListener("DOMContentLoaded", function () {
             accion();
         }
     });
-
-    // Estado inicial
-    if (!$("fechaInicio").value) $("fechaInicio").value = hoyISO();
-    recalcularTotal();
 });

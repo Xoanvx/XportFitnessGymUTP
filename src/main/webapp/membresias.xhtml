@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Suscripción de membresía.
-    Estructura basada en SisdataGimnasio/frm_RegistroMembresia:
-      Suscripción · selector de planes [F5] · Datos del socio · Observación y pago · Cronograma.
-    Por ahora es solo la estructura visual (sin conexión al controlador).
+    Suscripción de membresía (basada en SisdataGimnasio/frm_RegistroMembresia).
+    Conectada a suscripcionMembresiaBean:
+      Nuevo [F2] · Ver membresías [F5] · Buscar socio [F6] · Nuevo socio [F7] · Registrar [F3] · Eliminar.
 -->
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
     xmlns:ui="jakarta.faces.facelets" xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core"
-    xmlns:app="jakarta.faces.composite/components" template="/WEB-INF/templates/principal.xhtml">
+    xmlns:pt="jakarta.faces.passthrough" template="/WEB-INF/templates/principal.xhtml">
     <ui:param name="menuOpcion" value="suscripcionMembresia" />
     <ui:param name="menuSubmenu" value="membresias" />
     <ui:define name="title">Suscripción de Membresía | Xport Fitness Gym</ui:define>
     <ui:define name="styles">
 <!-- ?v= obliga al navegador a descargar la versión nueva (subir el número al cambiar el CSS) -->
-<link rel="stylesheet" href="#{request.contextPath}/css/membresias.css?v=20261113-3" />
+<link rel="stylesheet" href="#{request.contextPath}/css/membresias.css?v=20261118-1" />
     </ui:define>
     <ui:define name="content">
 <main class="main-content">
         <section class="panel">
+            <h:form id="formMembresia" prependId="false" styleClass="form-externo">
+
             <!-- ===================== CABECERA ===================== -->
             <div class="cabecera-suscripcion">
                 <div class="titulo-modulo">
@@ -27,99 +28,111 @@
                 <div class="registro-info">
                     <div class="registro-dato">
                         <label for="nroRegistro"><i class="fa-solid fa-hashtag"></i> N° registro</label>
-                        <input type="text" id="nroRegistro" name="nroRegistro" value="00000116" readonly="readonly" />
+                        <h:inputText id="nroRegistro" value="#{suscripcionMembresiaBean.suscripcion.nroSuscripcion_id}" readonly="true" />
                     </div>
                     <div class="registro-dato">
                         <span class="registro-etiqueta"><i class="fa-solid fa-circle-info"></i> Estado</span>
-                        <strong class="estado-badge estado-pendiente" id="lblEstado">Pendiente</strong>
+                        <strong class="estado-badge #{suscripcionMembresiaBean.claseEstado}" id="lblEstado">#{suscripcionMembresiaBean.suscripcion.estadoSusc}</strong>
                     </div>
                 </div>
             </div>
 
+            <!-- ===================== MENSAJES ===================== -->
+            <h:messages id="mensajes" globalOnly="true" layout="list" styleClass="msg-membresia"
+                        infoClass="msg-ok" warnClass="msg-aviso" errorClass="msg-error" />
+
             <!-- ===================== ACCIONES SUPERIORES ===================== -->
             <div class="barra-acciones">
-                <button type="button" class="btn-buscar" id="btnVerMembresias"><i class="fa-solid fa-list"></i> Ver membresías [F5]</button>
+                <h:commandLink id="btnVerMembresias" styleClass="btn-buscar" action="#{suscripcionMembresiaBean.verMembresias}"><i class="fa-solid fa-list"></i> Ver membresías [F5]</h:commandLink>
                 <button type="button" class="btn-buscar btn-secundario" id="btnRenovar"><i class="fa-solid fa-arrows-rotate"></i> Renovar membresía</button>
                 <span class="barra-ayuda"><i class="fa-solid fa-lightbulb"></i> Elija el plan con [F5] y busque al socio con [F6].</span>
             </div>
 
             <div class="contenido-form">
-                <form class="form-membresia" action="#" method="post" id="formMembresia">
+                <div class="form-membresia" id="formMembresiaCampos">
 
                     <!-- ===================== SUSCRIPCIÓN ===================== -->
                     <div class="seccion-titulo"><i class="fa-solid fa-file-signature"></i> Suscripción</div>
 
-                    <!-- Selector de planes (dataGridView1 del formulario original) -->
-                    <div class="selector-planes" id="selectorPlanes" hidden="hidden">
+                    <!-- Selector de planes (lista real: MembresiaFACADE.ListaMembresiaF) -->
+                    <h:panelGroup layout="block" id="selectorPlanes" styleClass="selector-planes" rendered="#{suscripcionMembresiaBean.mostrarPlanes}">
                         <div class="selector-planes-titulo">
                             <span><i class="fa-solid fa-clipboard-list"></i> Seleccione una membresía</span>
-                            <button type="button" class="selector-cerrar" id="btnCerrarPlanes" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+                            <h:commandLink id="btnCerrarPlanes" styleClass="selector-cerrar" title="Cerrar"
+                                           action="#{suscripcionMembresiaBean.cerrarPlanes}" immediate="true"><i class="fa-solid fa-xmark"></i></h:commandLink>
                         </div>
                         <div class="tabla-asistencias-scroll">
-                            <table class="tabla-asistencias tabla-planes">
-                                <thead>
-                                    <tr><th>Código</th><th>Denominación</th><th>Días</th><th>Semanas</th><th>Meses</th><th>Años</th><th>Días límite</th><th>Tarifa</th><th>Frecuencia</th><th>Estado</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr data-codigo="0001" data-nombre="PLAN BÁSICO" data-duracion="0 días, 0 semanas, 1 mes, 0 años" data-meses="1" data-limite="0" data-tarifa="99.00" data-frecuencia="FULL DIARIO">
-                                        <td>0001</td><td>PLAN BÁSICO</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>99.00</td><td>FULL DIARIO</td><td>Activo</td>
-                                    </tr>
-                                    <tr data-codigo="0002" data-nombre="PLAN TRIMESTRAL" data-duracion="0 días, 0 semanas, 3 meses, 0 años" data-meses="3" data-limite="36" data-tarifa="249.00" data-frecuencia="INTERDIARIO">
-                                        <td>0002</td><td>PLAN TRIMESTRAL</td><td>0</td><td>0</td><td>3</td><td>0</td><td>36</td><td>249.00</td><td>INTERDIARIO</td><td>Activo</td>
-                                    </tr>
-                                    <tr data-codigo="0003" data-nombre="PLAN ANUAL" data-duracion="0 días, 0 semanas, 0 meses, 1 año" data-meses="12" data-limite="0" data-tarifa="799.00" data-frecuencia="FULL DIARIO">
-                                        <td>0003</td><td>PLAN ANUAL</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>799.00</td><td>FULL DIARIO</td><td>Activo</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <h:dataTable value="#{suscripcionMembresiaBean.planes}" var="p" styleClass="tabla-asistencias tabla-planes">
+                                <h:column>
+                                    <f:facet name="header">Código</f:facet>
+                                    <h:commandLink value="#{p.codigoM}" action="#{suscripcionMembresiaBean.seleccionarPlan(p.codigoM)}" />
+                                </h:column>
+                                <h:column><f:facet name="header">Denominación</f:facet>#{p.nombreMembresia}</h:column>
+                                <h:column><f:facet name="header">Días</f:facet>#{p.duracionDias}</h:column>
+                                <h:column><f:facet name="header">Semanas</f:facet>#{p.duracionSemanas}</h:column>
+                                <h:column><f:facet name="header">Meses</f:facet>#{p.duracionMeses}</h:column>
+                                <h:column><f:facet name="header">Años</f:facet>#{p.duracionAnios}</h:column>
+                                <h:column><f:facet name="header">Días límite</f:facet>#{p.diasLimite}</h:column>
+                                <h:column>
+                                    <f:facet name="header">Tarifa</f:facet>
+                                    <h:outputText value="#{p.tarifa}"><f:convertNumber pattern="0.00" locale="en_US" /></h:outputText>
+                                </h:column>
+                                <h:column><f:facet name="header">Frecuencia</f:facet>#{p.frecuencia}</h:column>
+                                <h:column><f:facet name="header">Estado</f:facet>#{p.estado}</h:column>
+                            </h:dataTable>
                         </div>
-                    </div>
+                    </h:panelGroup>
 
                     <div class="fila fila-membresia">
                         <div class="campo">
                             <label for="nombreMembresia"><i class="fa-solid fa-id-card"></i> Membresía</label>
                             <div class="campo-compuesto">
-                                <input type="text" id="codMembresia" name="codMembresia" class="input-codigo" placeholder="Cód." readonly="readonly" />
-                                <input type="text" id="nombreMembresia" name="nombreMembresia" placeholder="Seleccione con Ver membresías [F5]" readonly="readonly" />
+                                <h:inputText id="codMembresia" styleClass="input-codigo" value="#{suscripcionMembresiaBean.suscripcion.codigoM}" readonly="true" pt:placeholder="Cód." />
+                                <h:inputText id="nombreMembresia" value="#{suscripcionMembresiaBean.suscripcion.nombreMembresia}" readonly="true" pt:placeholder="Seleccione con Ver membresías [F5]" />
                             </div>
                         </div>
                         <div class="campo">
                             <label for="diasLimite"><i class="fa-solid fa-calendar-days"></i> Días límite</label>
-                            <input type="text" id="diasLimite" name="diasLimite" value="0" readonly="readonly" />
+                            <h:inputText id="diasLimite" value="#{suscripcionMembresiaBean.suscripcion.diasLimite}" readonly="true" />
                         </div>
                         <div class="campo">
                             <label for="tarifa"><i class="fa-solid fa-dollar-sign"></i> Tarifa</label>
-                            <input type="text" id="tarifa" name="tarifa" value="0.00" readonly="readonly" />
+                            <h:inputText id="tarifa" value="#{suscripcionMembresiaBean.suscripcion.tarifa}" readonly="true">
+                                <f:convertNumber pattern="0.00" locale="en_US" />
+                            </h:inputText>
                         </div>
                     </div>
 
                     <div class="fila">
                         <div class="campo">
                             <label for="duracion"><i class="fa-solid fa-hourglass"></i> Duración</label>
-                            <input type="text" id="duracion" name="duracion" readonly="readonly" />
+                            <h:inputText id="duracion" value="#{suscripcionMembresiaBean.duracionTexto}" readonly="true" />
                         </div>
                         <div class="campo">
                             <label for="frecuencia"><i class="fa-solid fa-repeat"></i> Frecuencia</label>
-                            <input type="text" id="frecuencia" name="frecuencia" readonly="readonly" />
+                            <h:inputText id="frecuencia" value="#{suscripcionMembresiaBean.suscripcion.frecuencia}" readonly="true" />
                         </div>
                     </div>
 
                     <div class="fila">
                         <div class="campo">
                             <label for="fechaInicio"><i class="fa-solid fa-calendar"></i> Inicio</label>
-                            <input type="date" id="fechaInicio" name="fechaInicio" />
+                            <h:inputText id="fechaInicio" value="#{suscripcionMembresiaBean.fechaInicioTxt}" pt:type="date">
+                                <f:ajax event="change" listener="#{suscripcionMembresiaBean.alCambiarFechaInicio}"
+                                        render="fechaInicio fechaVencimiento codMembresia nombreMembresia diasLimite tarifa duracion frecuencia subtotal descuento total mensajes" />
+                            </h:inputText>
                         </div>
                         <div class="campo">
                             <label for="fechaVencimiento"><i class="fa-solid fa-calendar-check"></i> Vencimiento</label>
-                            <input type="date" id="fechaVencimiento" name="fechaVencimiento" />
+                            <h:inputText id="fechaVencimiento" value="#{suscripcionMembresiaBean.fechaFinTxt}" pt:type="date" />
                         </div>
                     </div>
 
                     <div class="campo campo-full">
                         <label for="nombreResponsable"><i class="fa-solid fa-user-tie"></i> Responsable</label>
                         <div class="campo-compuesto">
-                            <input type="text" id="codResponsable" name="codResponsable" class="input-codigo" value="#{sessionScope.usuarioAutenticado.personal_ID}" readonly="readonly" />
-                            <input type="text" id="nombreResponsable" name="nombreResponsable" value="#{sessionScope.usuarioAutenticado.nombres} #{sessionScope.usuarioAutenticado.apellidoPaterno}" readonly="readonly" />
+                            <input type="text" id="codResponsable" class="input-codigo" value="#{sessionScope.usuarioAutenticado.personal_ID}" readonly="readonly" />
+                            <input type="text" id="nombreResponsable" value="#{sessionScope.usuarioAutenticado.nombres} #{sessionScope.usuarioAutenticado.apellidoPaterno}" readonly="readonly" />
                         </div>
                     </div>
 
@@ -129,23 +142,23 @@
                     <div class="fila fila-socio">
                         <div class="campo">
                             <label for="codigo"><i class="fa-solid fa-barcode"></i> Código</label>
-                            <input type="text" id="codigo" name="codigo" placeholder="70012717" />
+                            <h:inputText id="codigo" value="#{suscripcionMembresiaBean.codigoSocio}" pt:placeholder="Código o DNI" pt:autocomplete="off" />
                         </div>
-                        <button type="button" class="btn-buscar" id="btnBuscar"><i class="fa-solid fa-magnifying-glass"></i> Buscar [F6]</button>
+                        <h:commandLink id="btnBuscar" styleClass="btn-buscar" action="#{suscripcionMembresiaBean.buscarSocio}"><i class="fa-solid fa-magnifying-glass"></i> Buscar [F6]</h:commandLink>
                         <button type="button" class="btn-buscar btn-secundario" id="btnNuevoSocio"><i class="fa-solid fa-user-plus"></i> Nuevo socio [F7]</button>
                         <div class="campo">
                             <label for="telefono"><i class="fa-solid fa-phone"></i> Teléfono</label>
-                            <input type="tel" id="telefono" name="telefono" readonly="readonly" />
+                            <h:inputText id="telefono" value="#{suscripcionMembresiaBean.socioTelefono}" readonly="true" pt:type="tel" />
                         </div>
                     </div>
 
                     <div class="campo campo-full">
                         <label for="nombre"><i class="fa-solid fa-user"></i> Nombre</label>
-                        <input type="text" id="nombre" name="nombre" placeholder="Nombre completo del socio" readonly="readonly" />
+                        <h:inputText id="nombre" value="#{suscripcionMembresiaBean.socioNombre}" readonly="true" pt:placeholder="Nombre completo del socio" />
                     </div>
                     <div class="campo campo-full">
                         <label for="direccion"><i class="fa-solid fa-location-dot"></i> Dirección</label>
-                        <input type="text" id="direccion" name="direccion" placeholder="Dirección del socio" readonly="readonly" />
+                        <h:inputText id="direccion" value="#{suscripcionMembresiaBean.socioDireccion}" readonly="true" pt:placeholder="Dirección del socio" />
                     </div>
 
                     <!-- ===================== OBSERVACIÓN Y PAGO ===================== -->
@@ -154,11 +167,11 @@
                     <div class="fila fila-observacion">
                         <div class="campo">
                             <label for="observacion"><i class="fa-solid fa-comment"></i> Observación</label>
-                            <textarea id="observacion" name="observacion" rows="2" placeholder="Membresía mensual - Plan estándar"></textarea>
+                            <h:inputTextarea id="observacion" value="#{suscripcionMembresiaBean.suscripcion.observacionSusc}" rows="2" pt:placeholder="Membresía mensual - Plan estándar" />
                         </div>
                         <div class="campo">
                             <label for="condicion"><i class="fa-solid fa-circle-check"></i> Condición</label>
-                            <input type="text" id="condicion" name="condicion" value="ACTIVA" readonly="readonly" />
+                            <h:inputText id="condicion" value="#{suscripcionMembresiaBean.suscripcion.condicionSusc}" readonly="true" />
                         </div>
                     </div>
 
@@ -166,32 +179,44 @@
                     <div class="resumen-pago">
                         <div class="tarjeta-pago">
                             <label for="subtotal" class="tarjeta-pago-titulo"><i class="fa-solid fa-receipt"></i> Subtotal (S/)</label>
-                            <input type="text" id="subtotal" name="subtotal" value="0.00" readonly="readonly" />
+                            <h:inputText id="subtotal" value="#{suscripcionMembresiaBean.suscripcion.subTotal}" readonly="true">
+                                <f:convertNumber pattern="0.00" locale="en_US" />
+                            </h:inputText>
                         </div>
                         <div class="tarjeta-pago">
                             <label class="tarjeta-pago-titulo check-descuento">
-                                <input type="checkbox" id="aplicarDescuento" name="aplicarDescuento" />
+                                <h:selectBooleanCheckbox id="aplicarDescuento" value="#{suscripcionMembresiaBean.aplicarDescuento}">
+                                    <f:ajax listener="#{suscripcionMembresiaBean.alCambiarAplicarDescuento}" render="descuento total" />
+                                </h:selectBooleanCheckbox>
                                 Aplicar descuento (S/)
                             </label>
-                            <input type="number" id="descuento" name="descuento" value="0.00" min="0" step="0.01" disabled="disabled" aria-label="Descuento" />
+                            <h:inputText id="descuento" value="#{suscripcionMembresiaBean.suscripcion.descuento}"
+                                         disabled="#{!suscripcionMembresiaBean.aplicarDescuento}"
+                                         pt:type="number" pt:min="0" pt:step="0.01" pt:aria-label="Descuento">
+                                <f:convertNumber pattern="0.00" locale="en_US" />
+                                <f:ajax event="change" listener="#{suscripcionMembresiaBean.alCambiarDescuento}" render="descuento total mensajes" />
+                            </h:inputText>
                         </div>
                         <div class="tarjeta-pago tarjeta-total">
                             <label for="total" class="tarjeta-pago-titulo"><i class="fa-solid fa-sack-dollar"></i> TOTAL (S/)</label>
-                            <input type="text" id="total" name="total" value="0.00" readonly="readonly" />
+                            <h:inputText id="total" value="#{suscripcionMembresiaBean.suscripcion.totalSusc}" readonly="true">
+                                <f:convertNumber pattern="0.00" locale="en_US" />
+                            </h:inputText>
                         </div>
                     </div>
 
                     <!-- ===================== BOTONES ===================== -->
                     <div class="botones-form">
-                        <button type="button" class="btn-form btn-nuevo" id="btnNuevo"><i class="fa-solid fa-plus"></i> Nuevo [F2]</button>
-                        <button type="button" class="btn-form btn-registrar" id="btnRegistrar"><i class="fa-solid fa-floppy-disk"></i> Registrar [F3]</button>
-                        <button type="button" class="btn-form btn-eliminar" id="btnEliminar"><i class="fa-solid fa-trash"></i> Eliminar</button>
+                        <h:commandLink id="btnNuevo" styleClass="btn-form btn-nuevo" action="#{suscripcionMembresiaBean.nuevo}" immediate="true"><i class="fa-solid fa-plus"></i> Nuevo [F2]</h:commandLink>
+                        <h:commandLink id="btnRegistrar" styleClass="btn-form btn-registrar" action="#{suscripcionMembresiaBean.grabar}"><i class="fa-solid fa-floppy-disk"></i> Registrar [F3]</h:commandLink>
+                        <h:commandLink id="btnEliminar" styleClass="btn-form btn-eliminar" action="#{suscripcionMembresiaBean.eliminar(suscripcionMembresiaBean.suscripcion.nroSuscripcion_id)}"
+                                       immediate="true"
+                                       onclick="return confirm('¿Eliminar la suscripción #{suscripcionMembresiaBean.suscripcion.nroSuscripcion_id}?');"><i class="fa-solid fa-trash"></i> Eliminar</h:commandLink>
                         <button type="button" class="btn-form btn-pago" id="btnComprobante"><i class="fa-solid fa-receipt"></i> Generar comprobante [F4]</button>
                         <button type="button" class="btn-form btn-actualizar" id="btnImprimir"><i class="fa-solid fa-print"></i> Imprimir [Pausa]</button>
                         <button type="button" class="btn-form btn-salir" id="btnSalir"><i class="fa-solid fa-right-from-bracket"></i> Salir [Esc]</button>
                     </div>
-                    <p class="nota-funcionalidad">Vista de plantilla: registrar, buscar socios y generar comprobantes requieren conectarse al controlador y a la base de datos.</p>
-                </form>
+                </div>
 
                 <!-- ===================== CRONOGRAMA ===================== -->
                 <aside class="asistencias-card">
@@ -200,23 +225,19 @@
                         <table class="tabla-asistencias">
                             <thead><tr><th>Clase</th><th>Día</th><th>Marcado</th></tr></thead>
                             <tbody id="cronograma">
-                                <tr><td>CLASE</td><td>1</td><td>SI</td></tr>
-                                <tr><td>CLASE</td><td>2</td><td>SI</td></tr>
-                                <tr><td>CLASE</td><td>3</td><td>SI</td></tr>
-                                <tr><td>CLASE</td><td>4</td><td>NO</td></tr>
-                                <tr><td>CLASE</td><td>5</td><td>NO</td></tr>
-                                <tr><td>CLASE</td><td>6</td><td>NO</td></tr>
-                                <tr><td>CLASE</td><td>7</td><td>NO</td></tr>
-                                <tr><td>CLASE</td><td>8</td><td>NO</td></tr>
+                                <ui:repeat value="#{suscripcionMembresiaBean.cronograma}" var="n">
+                                    <tr><td>CLASE</td><td>#{n}</td><td>NO</td></tr>
+                                </ui:repeat>
                             </tbody>
                         </table>
                     </div>
                 </aside>
             </div>
+            </h:form>
         </section>
     </main>
     </ui:define>
     <ui:define name="scripts">
-<script src="#{request.contextPath}/js/membresias.js?v=20261113-3"></script>
+<script src="#{request.contextPath}/js/membresias.js?v=20261118-1"></script>
     </ui:define>
 </ui:composition>
